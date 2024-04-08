@@ -16,8 +16,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,20 +56,42 @@ class MainActivity : ComponentActivity() {
             Background()
             SubHeader()
             Header()
-            AlarmButton()
+            Column(
+                modifier = Modifier
+                    .background(Color.Transparent)
+                    .fillMaxHeight(0.30f)
+                    .fillMaxWidth()
+                    .padding(top = 60.dp)
+                    .padding(horizontal = 20.dp),
+            ) {
+                Text(
+                    text = "Next Alarm in: ...",
+                    color = Dark_Purple,
+                    fontSize = 45.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Medium
+
+                )
+            }
+            TransparentHeader()
+
         }
     }
 
     @Composable
-    fun AlarmButton() {
-        Column(
+    fun TransparentHeader() {
+        ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(125.dp)
-                .background(Color(4281802289)),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxHeight(0.30f)
         ) {
+            val (blankBox, alarmButton1, alarmButton2) = createRefs()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
+                    .constrainAs(blankBox) {}
+            ) {}
             Button(
                 onClick = {
                     val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
@@ -77,9 +103,41 @@ class MainActivity : ComponentActivity() {
                     contentColor = Color(4281802289)
                 ),
                 modifier = Modifier
-                    .fillMaxSize()
-            ) {
+                    .padding(top = 35.dp)
+                    .height(125.dp)
+                    .fillMaxWidth()
+                    .constrainAs(alarmButton1) {
+                        top.linkTo(blankBox.bottom)
+                        bottom.linkTo(alarmButton2.top)
+                    }
 
+            ) {
+                Text(
+                    text = "8:00",
+                    fontSize = 45.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            Button(
+                onClick = {
+                    val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
+                    startActivity(navigate)
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(4284563290),
+                    contentColor = Color(4281802289)
+                ),
+                modifier = Modifier
+                    .padding(top = 25.dp)
+                    .height(125.dp)
+                    .fillMaxWidth()
+                    .constrainAs(alarmButton2) {
+                        top.linkTo(alarmButton1.bottom)
+                    }
+
+            ) {
                 Text(
                     text = "8:00",
                     fontSize = 45.sp,
@@ -88,61 +146,103 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-
     }
-
+/*
+    @Preview
     @Composable
-    fun Background() {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(4281802289))
-        )
-        {}
-    }
-
-    @Composable
-    fun Header() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .background(Color(4294493562))
-        )
-        {}
-    }
-
-    @Composable
-    fun SubHeader() {
+    private fun ScrollBoxes() {
         Column(
             modifier = Modifier
-                .background(Color(4294019433))
-                .fillMaxHeight(0.30f)
-                .fillMaxWidth()
-                .padding(top = 60.dp)
-                .padding(horizontal = 20.dp),
-        )
-        {
-            Text(
-                text = "Next Alarm in: ...",
-                color = Dark_Purple,
-                fontSize = 45.sp,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Medium
-
-            )
+                .background(Color.LightGray)
+                .size(100.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            repeat(10) {
+                Text("Item $it", modifier = Modifier.padding(2.dp))
+            }
         }
     }
 
-    val fontFamily = FontFamily(
-        Font(R.font.lexend_black, FontWeight.Black),
-        Font(R.font.lexend_bold, FontWeight.Bold),
-        Font(R.font.lexend_extrabold, FontWeight.ExtraBold),
-        Font(R.font.lexend_extralight, FontWeight.ExtraLight),
-        Font(R.font.lexend_light, FontWeight.Light),
-        Font(R.font.lexend_medium, FontWeight.Medium),
-        Font(R.font.lexend_regular, FontWeight.Normal),
-        Font(R.font.lexend_semibold, FontWeight.SemiBold),
-        Font(R.font.lexend_thin, FontWeight.Thin),
-    )
+    @Preview
+    @Composable
+    private fun ScrollBoxesSmooth() {
+        // Smoothly scroll 100px on first composition
+        val state = rememberScrollState()
+        LaunchedEffect(Unit) { state.animateScrollTo(100) }
+
+        Column(
+            modifier = Modifier
+                .background(Color(4281802289))
+                .size(250.dp)
+                .padding(horizontal = 25.dp)
+                .verticalScroll(state)
+        ) {
+            repeat(10) {
+                Button(
+                    onClick = {
+                        val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
+                        startActivity(navigate)
+                    },
+                    shape = RoundedCornerShape(20.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(4284563290),
+                        contentColor = Color(4281802289)
+                    ),
+                    modifier = Modifier
+                        .height(125.dp)
+                        .fillMaxWidth()
+
+                ) {
+                    Text(
+                        text = "8:00",
+                        fontSize = 45.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
+    }
+
+ */
 }
+
+@Composable
+fun Background() {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(4281802289))
+    ) {}
+}
+
+@Composable
+fun Header() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .background(Color(4294493562))
+    ) {}
+}
+ @Composable
+ fun SubHeader() {
+     Column(
+         modifier = Modifier
+             .background(Color(4294019433))
+             .fillMaxHeight(0.30f)
+             .fillMaxWidth()
+     ) {}
+ }
+
+val fontFamily = FontFamily(
+    Font(R.font.lexend_black, FontWeight.Black),
+    Font(R.font.lexend_bold, FontWeight.Bold),
+    Font(R.font.lexend_extrabold, FontWeight.ExtraBold),
+    Font(R.font.lexend_extralight, FontWeight.ExtraLight),
+    Font(R.font.lexend_light, FontWeight.Light),
+    Font(R.font.lexend_medium, FontWeight.Medium),
+    Font(R.font.lexend_regular, FontWeight.Normal),
+    Font(R.font.lexend_semibold, FontWeight.SemiBold),
+    Font(R.font.lexend_thin, FontWeight.Thin)
+)
