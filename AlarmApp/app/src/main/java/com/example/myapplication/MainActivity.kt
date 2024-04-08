@@ -74,7 +74,6 @@ class MainActivity : ComponentActivity() {
                 )
             }
             TransparentHeader()
-
         }
     }
 
@@ -82,72 +81,31 @@ class MainActivity : ComponentActivity() {
     fun TransparentHeader() {
         ConstraintLayout(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.30f)
+                .fillMaxSize()
         ) {
-            val (blankBox, alarmButton1, alarmButton2) = createRefs()
+            val (blankBox, scrollBox) = createRefs()
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Transparent)
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.30f)
                     .constrainAs(blankBox) {}
-            ) {}
-            Button(
-                onClick = {
-                    val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
-                    startActivity(navigate)
-                },
-                shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(4284563290),
-                    contentColor = Color(4281802289)
-                ),
-                modifier = Modifier
-                    .padding(top = 35.dp)
-                    .height(125.dp)
-                    .fillMaxWidth()
-                    .constrainAs(alarmButton1) {
-                        top.linkTo(blankBox.bottom)
-                        bottom.linkTo(alarmButton2.top)
-                    }
-
-            ) {
-                Text(
-                    text = "8:00",
-                    fontSize = 45.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold
-                )
+                    .background(Color.Transparent)
+            ){
             }
-            Button(
-                onClick = {
-                    val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
-                    startActivity(navigate)
-                },
-                shape = RoundedCornerShape(20.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(4284563290),
-                    contentColor = Color(4281802289)
-                ),
+            Box (
                 modifier = Modifier
-                    .padding(top = 25.dp)
-                    .height(125.dp)
-                    .fillMaxWidth()
-                    .constrainAs(alarmButton2) {
-                        top.linkTo(alarmButton1.bottom)
+                    .fillMaxSize()
+                    .constrainAs(scrollBox) {
+                        top.linkTo(blankBox.bottom, margin = 25.dp)
                     }
 
-            ) {
-                Text(
-                    text = "8:00",
-                    fontSize = 45.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold
-                )
+            ){
+                ScrollBoxes()
+                ScrollBoxesSmooth()
             }
         }
     }
-/*
+
     @Preview
     @Composable
     private fun ScrollBoxes() {
@@ -156,9 +114,10 @@ class MainActivity : ComponentActivity() {
                 .background(Color.LightGray)
                 .size(100.dp)
                 .verticalScroll(rememberScrollState())
+                .padding(vertical = 25.dp)
         ) {
             repeat(10) {
-                Text("Item $it", modifier = Modifier.padding(2.dp))
+                Text("Item $it", modifier = Modifier.padding(25.dp))
             }
         }
     }
@@ -166,15 +125,14 @@ class MainActivity : ComponentActivity() {
     @Preview
     @Composable
     private fun ScrollBoxesSmooth() {
-        // Smoothly scroll 100px on first composition
         val state = rememberScrollState()
         LaunchedEffect(Unit) { state.animateScrollTo(100) }
 
         Column(
             modifier = Modifier
                 .background(Color(4281802289))
-                .size(250.dp)
-                .padding(horizontal = 25.dp)
+                .size(500.dp)
+                .fillMaxWidth()
                 .verticalScroll(state)
         ) {
             repeat(10) {
@@ -189,8 +147,9 @@ class MainActivity : ComponentActivity() {
                         contentColor = Color(4281802289)
                     ),
                     modifier = Modifier
-                        .height(125.dp)
+                        .height(100.dp)
                         .fillMaxWidth()
+                        .padding(vertical = 6.dp)
 
                 ) {
                     Text(
@@ -203,8 +162,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
- */
 }
 
 @Composable
