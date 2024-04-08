@@ -34,14 +34,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            setContent {
-                Background()
-                SubHeader()
-                Header()
-            }
+            Background()
+            SubHeader()
+            Header()
         }
     }
 }
+
 
 @Composable
 fun Background(){
@@ -58,7 +57,7 @@ fun Header(){
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
+            .height(50.dp)
             .background(Color(4294493562))
     )
     {}
@@ -69,16 +68,16 @@ fun SubHeader(){
     Column(
         modifier = Modifier
             .background(Color(4294019433))
-            .fillMaxHeight(0.36f)
+            .fillMaxHeight(0.30f)
             .fillMaxWidth()
-            .padding(top = 100.dp)
+            .padding(top = 60.dp)
             .padding(horizontal = 20.dp),
     )
     {
         Text(
             text = "Next Alarm in: ...",
             color = Dark_Purple,
-            fontSize = 50.sp,
+            fontSize = 45.sp,
             fontFamily = fontFamily,
             fontWeight = FontWeight.Medium
 
@@ -87,5 +86,13 @@ fun SubHeader(){
 }
 
 val fontFamily = FontFamily(
-   Font(R.font.lexend_medium, FontWeight.Medium)
+    Font(R.font.lexend_black, FontWeight.Black),
+    Font(R.font.lexend_bold, FontWeight.Bold),
+    Font(R.font.lexend_extrabold, FontWeight.ExtraBold),
+    Font(R.font.lexend_extralight, FontWeight.ExtraLight),
+    Font(R.font.lexend_light, FontWeight.Light),
+    Font(R.font.lexend_medium, FontWeight.Medium),
+    Font(R.font.lexend_regular, FontWeight.Normal),
+    Font(R.font.lexend_semibold, FontWeight.SemiBold),
+    Font(R.font.lexend_thin, FontWeight.Thin),
 )
