@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import android.app.Activity
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,8 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -49,6 +53,12 @@ fun SubHeader() {
     ) {}
 }
 
+@Composable
+fun LockOrientation() {
+    val context = LocalContext.current
+    (context as? Activity)?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+}
+
 val fontFamily = FontFamily(
     Font(R.font.lexend_black, FontWeight.Black),
     Font(R.font.lexend_bold, FontWeight.Bold),
@@ -60,4 +70,3 @@ val fontFamily = FontFamily(
     Font(R.font.lexend_semibold, FontWeight.SemiBold),
     Font(R.font.lexend_thin, FontWeight.Thin)
 )
-

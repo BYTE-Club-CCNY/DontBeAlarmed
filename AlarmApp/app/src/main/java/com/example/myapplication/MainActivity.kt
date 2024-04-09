@@ -1,6 +1,8 @@
 package com.example.myapplication
 
+import android.app.Activity
 import android.content.Intent
+import android.content.pm.ActivityInfo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -42,22 +44,22 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import org.w3c.dom.Text
+import androidx.compose.ui.platform.LocalContext
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            LockOrientation()
             Background()
             SubHeader()
             Header()
-            TransparentHeader()
-            SubHeaderText()
+            ConstraintBoxes()
         }
     }
-    // import app icon
+
     @Composable
-    fun TransparentHeader() {
+    fun ConstraintBoxes() {
         ConstraintLayout {
             //add a button creating a new alarm
             val (blankBox, scrollBox) = createRefs()
@@ -67,7 +69,17 @@ class MainActivity : ComponentActivity() {
                     .height(225.dp)
                     .constrainAs(blankBox) {}
                     .background(Color.Transparent)
-            ) {}
+                    .padding(top = 60.dp)
+                    .padding(horizontal = 20.dp)
+            ) {
+                Text(
+                    text = "Next Alarm in: ...",
+                    color = Dark_Purple,
+                    fontSize = 45.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Medium
+                )
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -88,7 +100,7 @@ class MainActivity : ComponentActivity() {
         Column(
             modifier = Modifier
                 .background(Color(4281802289))
-                .size(500.dp)
+                .height(500.dp)
                 .fillMaxWidth()
                 .verticalScroll(state)
         ) {
@@ -142,24 +154,4 @@ fun OnOffButton() {
         )
 
     )
-}
-@Composable
-private fun SubHeaderText() {
-    Column(
-        modifier = Modifier
-            .background(Color.Transparent)
-            .fillMaxHeight(0.30f)
-            .fillMaxWidth()
-            .padding(top = 60.dp)
-            .padding(horizontal = 20.dp)
-    ) {
-        Text(
-            text = "Next Alarm in: ...",
-            color = Dark_Purple,
-            fontSize = 45.sp,
-            fontFamily = fontFamily,
-            fontWeight = FontWeight.Medium
-
-        )
-    }
 }
