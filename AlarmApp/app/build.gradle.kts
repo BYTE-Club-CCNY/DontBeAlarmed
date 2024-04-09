@@ -57,6 +57,7 @@ android {
 
 dependencies {
     //Room
+    annotationProcessor("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-gradle-plugin:2.6.1")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
