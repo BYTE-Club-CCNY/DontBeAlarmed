@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">My Application</string>
     <string name="title_activity_alarm_settings">AlarmSettings</string>
+    <string name="title_activity_home_page">HomePage</string>
+    <string name="title_activity_screen">Screen</string>
+    <string name="title_activity_screen2">Screen2</string>
 </resources>

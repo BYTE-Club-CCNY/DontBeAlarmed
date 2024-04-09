@@ -4,50 +4,33 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.myapplication.ui.theme.Dandelion
 import com.example.myapplication.ui.theme.Dark_Purple
-import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
-import com.example.myapplication.ui.theme.Soft_Purple
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,33 +39,14 @@ class MainActivity : ComponentActivity() {
             Background()
             SubHeader()
             Header()
-            Column(
-                modifier = Modifier
-                    .background(Color.Transparent)
-                    .fillMaxHeight(0.30f)
-                    .fillMaxWidth()
-                    .padding(top = 60.dp)
-                    .padding(horizontal = 20.dp),
-            ) {
-                Text(
-                    text = "Next Alarm in: ...",
-                    color = Dark_Purple,
-                    fontSize = 45.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Medium
-
-                )
-            }
+            SubHeaderText()
             TransparentHeader()
         }
     }
 
     @Composable
     fun TransparentHeader() {
-        ConstraintLayout(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+        ConstraintLayout {
             val (blankBox, scrollBox) = createRefs()
             Box(
                 modifier = Modifier
@@ -90,44 +54,24 @@ class MainActivity : ComponentActivity() {
                     .fillMaxHeight(0.30f)
                     .constrainAs(blankBox) {}
                     .background(Color.Transparent)
-            ){
-            }
-            Box (
+            ) {}
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .constrainAs(scrollBox) {
                         top.linkTo(blankBox.bottom, margin = 25.dp)
                     }
 
-            ){
-                ScrollBoxes()
-                ScrollBoxesSmooth()
+            ) {
+                ScrollButtons()
             }
         }
     }
 
-    @Preview
     @Composable
-    private fun ScrollBoxes() {
-        Column(
-            modifier = Modifier
-                .background(Color.LightGray)
-                .size(100.dp)
-                .verticalScroll(rememberScrollState())
-                .padding(vertical = 25.dp)
-        ) {
-            repeat(10) {
-                Text("Item $it", modifier = Modifier.padding(25.dp))
-            }
-        }
-    }
-
-    @Preview
-    @Composable
-    private fun ScrollBoxesSmooth() {
+    fun ScrollButtons() {
         val state = rememberScrollState()
-        LaunchedEffect(Unit) { state.animateScrollTo(100) }
-
+        LaunchedEffect(Unit) { state.animateScrollTo(10) }
         Column(
             modifier = Modifier
                 .background(Color(4281802289))
@@ -135,7 +79,7 @@ class MainActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .verticalScroll(state)
         ) {
-            repeat(10) {
+            for(i in 1..25) {
                 Button(
                     onClick = {
                         val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
@@ -150,10 +94,9 @@ class MainActivity : ComponentActivity() {
                         .height(100.dp)
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
-
                 ) {
                     Text(
-                        text = "8:00",
+                        text = "$i:00",
                         fontSize = 45.sp,
                         fontFamily = fontFamily,
                         fontWeight = FontWeight.Bold
@@ -182,8 +125,9 @@ fun Header() {
             .background(Color(4294493562))
     ) {}
 }
- @Composable
- fun SubHeader() {
+
+@Composable
+fun SubHeader() {
      Column(
          modifier = Modifier
              .background(Color(4294019433))
@@ -191,6 +135,27 @@ fun Header() {
              .fillMaxWidth()
      ) {}
  }
+
+@Composable
+private fun SubHeaderText() {
+    Column(
+        modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxHeight(0.30f)
+            .fillMaxWidth()
+            .padding(top = 60.dp)
+            .padding(horizontal = 20.dp)
+    ) {
+        Text(
+            text = "Next Alarm in: ...",
+            color = Dark_Purple,
+            fontSize = 45.sp,
+            fontFamily = fontFamily,
+            fontWeight = FontWeight.Medium
+
+        )
+    }
+}
 
 val fontFamily = FontFamily(
     Font(R.font.lexend_black, FontWeight.Black),
@@ -203,3 +168,5 @@ val fontFamily = FontFamily(
     Font(R.font.lexend_semibold, FontWeight.SemiBold),
     Font(R.font.lexend_thin, FontWeight.Thin)
 )
+
+
