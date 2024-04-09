@@ -108,35 +108,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Background() {
-    Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(4281802289))
-    ) {}
-}
-
-@Composable
-fun Header() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(50.dp)
-            .background(Color(4294493562))
-    ) {}
-}
-
-@Composable
-fun SubHeader() {
-     Column(
-         modifier = Modifier
-             .background(Color(4294019433))
-             .fillMaxHeight(0.30f)
-             .fillMaxWidth()
-     ) {}
- }
-
-@Composable
 private fun SubHeaderText() {
     Column(
         modifier = Modifier
@@ -156,17 +127,3 @@ private fun SubHeaderText() {
         )
     }
 }
-
-val fontFamily = FontFamily(
-    Font(R.font.lexend_black, FontWeight.Black),
-    Font(R.font.lexend_bold, FontWeight.Bold),
-    Font(R.font.lexend_extrabold, FontWeight.ExtraBold),
-    Font(R.font.lexend_extralight, FontWeight.ExtraLight),
-    Font(R.font.lexend_light, FontWeight.Light),
-    Font(R.font.lexend_medium, FontWeight.Medium),
-    Font(R.font.lexend_regular, FontWeight.Normal),
-    Font(R.font.lexend_semibold, FontWeight.SemiBold),
-    Font(R.font.lexend_thin, FontWeight.Thin)
-)
-
-
