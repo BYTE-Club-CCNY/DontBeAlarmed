@@ -17,11 +17,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.myapplication.ui.theme.Dark_Purple
@@ -29,8 +37,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import org.w3c.dom.Text
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,19 +51,20 @@ class MainActivity : ComponentActivity() {
             Background()
             SubHeader()
             Header()
-            SubHeaderText()
             TransparentHeader()
+            SubHeaderText()
         }
     }
-
+    // import app icon
     @Composable
     fun TransparentHeader() {
         ConstraintLayout {
+            //add a button creating a new alarm
             val (blankBox, scrollBox) = createRefs()
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.30f)
+                    .height(225.dp)
                     .constrainAs(blankBox) {}
                     .background(Color.Transparent)
             ) {}
@@ -67,7 +80,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
+    @Preview
     @Composable
     fun ScrollButtons() {
         val state = rememberScrollState()
@@ -79,7 +92,7 @@ class MainActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .verticalScroll(state)
         ) {
-            for(i in 1..25) {
+            for(i in 1..12) {
                 Button(
                     onClick = {
                         val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
@@ -94,19 +107,42 @@ class MainActivity : ComponentActivity() {
                         .height(100.dp)
                         .fillMaxWidth()
                         .padding(vertical = 6.dp)
-                ) {
-                    Text(
-                        text = "$i:00",
-                        fontSize = 45.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Bold
-                    )
+                ) {//horizontally constraint
+                    ConstraintLayout {
+                        val (alarmText, onOffButton) = createRefs()
+                        Text(
+                            text = "$i:00",
+                            fontSize = 45.sp,
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    OnOffButton()
                 }
             }
         }
     }
 }
+@Preview
+@Composable
+fun OnOffButton() {
+    var checked by remember { mutableStateOf(true) }
 
+    Switch(
+        checked = checked,
+        onCheckedChange = {
+            checked = it
+        },
+        colors = SwitchDefaults.colors(
+            checkedThumbColor = Color(4294493562),
+            checkedTrackColor = Color(4281802289),
+            uncheckedBorderColor = Color(4281802289),
+            uncheckedThumbColor = Color(4281802289),
+            uncheckedTrackColor = Color(4284563290)
+        )
+
+    )
+}
 @Composable
 private fun SubHeaderText() {
     Column(

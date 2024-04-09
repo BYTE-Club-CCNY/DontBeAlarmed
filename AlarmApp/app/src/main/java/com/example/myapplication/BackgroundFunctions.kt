@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.Dark_Purple
@@ -43,7 +44,7 @@ fun SubHeader() {
     Column(
         modifier = Modifier
             .background(Color(4294019433))
-            .fillMaxHeight(0.30f)
+            .height(225.dp)
             .fillMaxWidth()
     ) {}
 }
