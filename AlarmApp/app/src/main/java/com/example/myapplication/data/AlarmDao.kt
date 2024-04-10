@@ -1,4 +1,4 @@
-package com.example.inventory.data
+package com.example.myapplication.data
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,6 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.myapplication.data.Alarm
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,6 +27,6 @@ interface AlarmDao {
     fun getAllItems(): Flow<List<Alarm>>
 
     @Query("SELECT * from Alarms WHERE timestamp = :timestamp")
-    fun getTimestamp(timestamp: Long): Flow<Alarm>
+    fun getTimestamps(timestamp: Long): Flow<Alarm>
 
 }

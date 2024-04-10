@@ -1,4 +1,4 @@
-package com.example.inventory.data
+package com.example.myapplication.data
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -12,6 +12,6 @@ data class Alarm(
     val title: String,
     val timestamp: Long,
     val activity: String,
-    val boolean: Boolean
+
 
 )
