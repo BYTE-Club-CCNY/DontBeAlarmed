@@ -1,24 +1,13 @@
 package com.example.myapplication.data
 
-import android.content.Context
 import androidx.room.Database
-import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Alarm::class], version = 1, exportSchema = false)
+@Database(
+    entities = [Alarm::class],
+    version = 1
+)
 abstract class AlarmDatabase : RoomDatabase(){
 
-    abstract fun AlarmDao(): AlarmDao
-    companion object {
-        @Volatile
-        private var Instance: AlarmDatabase? = null
-
-        fun getDatabase(context: Context): AlarmDatabase {
-            return Instance ?: synchronized(this) {
-                Room.databaseBuilder(context, AlarmDatabase::class.java, "alarm_database")
-                    .build()
-                    .also { Instance = it}
-            }
-        }
-    }
+    abstract val dao: AlarmDao
 }

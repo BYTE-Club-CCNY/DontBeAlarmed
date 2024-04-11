@@ -54,6 +54,11 @@ class AlarmViewModel(
                     isAddingAlarm = true
                 ) }
             }
+            AlarmEvent.HideAlarm -> {
+                _state.update { it.copy(
+                    isAddingAlarm = false
+                ) }
+            }
             AlarmEvent.SaveAlarm -> {
                 val title = state.value.title
                 val timestamp = state.value.timestamp

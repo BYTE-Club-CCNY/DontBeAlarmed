@@ -6,6 +6,7 @@ sealed interface AlarmEvent {
     data class SetTimestamp(val timestamp: Long): AlarmEvent
     data class SetActivity(val activity: String): AlarmEvent
     object ShowAlarm: AlarmEvent
+    object HideAlarm : AlarmEvent
     data class DeleteAlarm(val alarm: Alarm): AlarmEvent
 
 }

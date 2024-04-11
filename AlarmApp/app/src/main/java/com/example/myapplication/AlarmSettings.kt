@@ -16,9 +16,9 @@ class AlarmSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Background()
-            SubHeader()
-            Header()
+            //Background()
+            //SubHeader()
+            //Header()
         }
     }
 }
