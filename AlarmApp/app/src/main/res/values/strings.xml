@@ -1,4 +1,15 @@
 <resources>
-    <string name="app_name">My Application</string>
-    <string name="title_activity_alarm_settings">AlarmSettings</string>
+    <string name="app_name">DateTimeUI</string>
+    <string name="day_of_week">Day item;</string>
+
+    <string-array name="Days">
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+    </string-array>
 </resources>
+
