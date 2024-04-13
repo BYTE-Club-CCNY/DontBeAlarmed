@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-<<<<<<< HEAD
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.modifier.ModifierLocal
@@ -59,8 +58,6 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.em
 import androidx.constraintlayout.compose.ChainStyle
-=======
->>>>>>> refs/remotes/origin/main
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

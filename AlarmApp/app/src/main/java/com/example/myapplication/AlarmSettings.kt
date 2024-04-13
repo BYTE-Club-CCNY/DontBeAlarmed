@@ -1,19 +1,12 @@
 package com.example.myapplication
 
 import android.content.Intent
+import android.graphics.Color.parseColor
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -42,6 +35,15 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
+import androidx.constraintlayout.widget.ConstraintSet
+import com.example.myapplication.ui.theme.Light_Gray
+import com.example.myapplication.ui.theme.Soft_Purple
+import androidx.compose.ui.Alignment
+import com.example.myapplication.ui.theme.Sunset_Orange
+
+
 class AlarmSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,17 +51,17 @@ class AlarmSettings : ComponentActivity() {
             Background()
             SubHeader()
             Header()
-            settingsPage()
+            SettingsPage()
         }
     }
 }
 
 @Preview
 @Composable
-fun settingsPage () {
+fun SettingsPage () {
     ConstraintLayout {
-        //add a button creating a new alarm
-        val (blankBox) = createRefs()
+        //header notifying next alarm time
+        val (blankBox, titleBox, timeBox, weekBox, activityBox, soundBox, snoozeBox) = createRefs()
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -78,5 +80,162 @@ fun settingsPage () {
 
             )
         }
+        //section to input title for alarm
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(50.dp))
+                .width(300.dp)
+                .height(40.dp)
+                .constrainAs(titleBox) {
+                    top.linkTo(blankBox.bottom, margin = 25.dp)
+                }
+                .background(Color.White)
+                .padding(all = 5.dp)
+        ) {
+            Text(
+                text = "Add Title",
+                color = Light_Gray,
+                fontSize = 20.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.Light
+            )
+        }
+        //section to input time values
+        Box(
+            modifier = Modifier
+                .width(300.dp)
+                .height(100.dp)
+                .constrainAs(timeBox) {
+                    top.linkTo(titleBox.bottom, margin = 25.dp)
+                }
+                .background(Color.Transparent)
+                .padding(all = 5.dp)
+        )
+        {
+            Row{
+                //hours
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(25.dp))
+                        .background(Color.White)
+                        .width(70.dp)
+                        .height(100.dp)
+                ) {
+                    Text(
+                        text = "00",
+                        color = Light_Gray,
+                        fontSize = 45.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Light
+                    )
+                }
+                Text(
+                    text = ":",
+                    color = Light_Gray,
+                    fontSize = 45.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Light)
+                //minutes
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(25.dp))
+                        .background(Color.White)
+                        .width(70.dp)
+                        .height(100.dp)
+                ){
+                    Text(
+                        text = "00",
+                        color = Light_Gray,
+                        fontSize = 45.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Light)
+                }
+
+            }
+        }
+        //section for week
+        Box(
+            modifier = Modifier
+                .width(300.dp)
+                .height(60.dp)
+                .constrainAs(weekBox) {
+                    top.linkTo(timeBox.bottom, margin = 25.dp)
+                }
+                .background(Sunset_Orange)
+                .padding(all = 5.dp)
+        )
+        {
+            Text(
+                text = "SMTWTFS",
+                color = Dark_Purple,
+                fontSize = 40.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.Bold)
+        }
+        // section for activity selection
+        Box(
+            modifier = Modifier
+                .width(300.dp)
+                .height(60.dp)
+                .constrainAs(activityBox) {
+                    top.linkTo(weekBox.bottom, margin = 25.dp)
+                }
+                .background(Sunset_Orange)
+                .padding(all = 5.dp)
+        )
+        {
+            Row{
+                Text(
+                    text = "Activities",
+                    color = Dark_Purple,
+                    fontSize = 20.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Bold)
+            }
+        }
+        // section for sound selection
+        Box(
+            modifier = Modifier
+                .width(300.dp)
+                .height(60.dp)
+                .constrainAs(soundBox) {
+                    top.linkTo(activityBox.bottom, margin = 25.dp)
+                }
+                .background(Sunset_Orange)
+                .padding(all = 5.dp)
+        )
+        {
+            Row{
+                Text(
+                    text = "Sound",
+                    color = Dark_Purple,
+                    fontSize = 20.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Bold)
+            }
+        }
+        // section to customize snooze duration and quantity
+        Box(
+            modifier = Modifier
+                .width(300.dp)
+                .height(75.dp)
+                .constrainAs(snoozeBox) {
+                    top.linkTo(soundBox.bottom, margin = 25.dp)
+                }
+                .background(Sunset_Orange)
+                .padding(all = 5.dp)
+        )
+        {
+            Row{
+                Text(
+                    text = "Snooze",
+                    
+                    color = Dark_Purple,
+                    fontSize = 20.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Bold)
+            }
+        }
     }
 }
+
