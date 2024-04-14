@@ -1,50 +1,43 @@
 package com.example.myapplication
 
-import android.content.Intent
-import android.graphics.Color.parseColor
 import android.os.Bundle
+import android.widget.NumberPicker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.myapplication.ui.theme.Dark_Purple
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
-import androidx.constraintlayout.widget.ConstraintSet
-import com.example.myapplication.ui.theme.Light_Gray
-import com.example.myapplication.ui.theme.Soft_Purple
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.TextStyle
 import com.example.myapplication.ui.theme.Alarm
-import androidx.compose.ui.text.input.TextFieldValue
+import com.example.myapplication.ui.theme.Dark_Purple
+import com.example.myapplication.ui.theme.Light_Gray
 import com.example.myapplication.ui.theme.Sunset_Orange
 
 
@@ -91,12 +84,13 @@ fun SettingsPage () {
             modifier = Modifier
                 .clip(RoundedCornerShape(50.dp))
                 .width(300.dp)
-                .height(80.dp)
+                .height(60.dp)
                 .constrainAs(titleBox) {
-                    top.linkTo(blankBox.bottom, margin = 25.dp)
+                    // change to 25 margin once i figure out textfield formatting
+                    top.linkTo(blankBox.bottom, margin = 10.dp)
                 }
+                // change to White once i figure out textfield formatting
                 .background(Color.Transparent)
-                .padding(all = 5.dp)
         ) {
             AlarmTitleInputBox()
         }
@@ -106,7 +100,8 @@ fun SettingsPage () {
                 .width(300.dp)
                 .height(100.dp)
                 .constrainAs(timeBox) {
-                    top.linkTo(titleBox.bottom, margin = 25.dp)
+                    // change to 25 margin once i figure out textfield formatting
+                    top.linkTo(titleBox.bottom, margin = 10.dp)
                 }
                 .background(Color.Transparent)
                 .padding(all = 5.dp)
@@ -114,20 +109,29 @@ fun SettingsPage () {
         {
             Row{
                 //hours
+                var selectedHour by remember { mutableStateOf(1) }
+                var selectedMinute by remember { mutableStateOf(0) }
                 Box(
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .clip(RoundedCornerShape(25.dp))
                         .background(Color.White)
                         .width(70.dp)
                         .height(100.dp)
                 ) {
-                    Text(
-                        text = "00",
-                        color = Light_Gray,
-                        fontSize = 45.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Light
-                    )
+                    HourPicker(
+                        selectedHour = selectedHour,
+                        onHourSelected = { hour ->
+                            selectedHour = hour
+                            firstAlarm.hour = selectedHour
+                        })
+//                    Text(
+//                        text = "00",
+//                        color = Light_Gray,
+//                        fontSize = 45.sp,
+//                        fontFamily = fontFamily,
+//                        fontWeight = FontWeight.Light
+//                    )
                 }
                 Text(
                     text = ":",
@@ -143,12 +147,18 @@ fun SettingsPage () {
                         .width(70.dp)
                         .height(100.dp)
                 ){
-                    Text(
-                        text = "00",
-                        color = Light_Gray,
-                        fontSize = 45.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Light)
+                    MinutePicker(
+                        selectedMinute = selectedMinute,
+                        onMinuteSelected = { minute ->
+                            selectedMinute = minute
+                            firstAlarm.minute = selectedMinute
+                        })
+//                    Text(
+//                        text = "00",
+//                        color = Light_Gray,
+//                        fontSize = 45.sp,
+//                        fontFamily = fontFamily,
+//                        fontWeight = FontWeight.Light)
                 }
 
             }
@@ -229,7 +239,6 @@ fun SettingsPage () {
             Row{
                 Text(
                     text = "Snooze",
-
                     color = Dark_Purple,
                     fontSize = 20.sp,
                     fontFamily = fontFamily,
@@ -241,8 +250,10 @@ fun SettingsPage () {
 
 @Composable
 fun AlarmTitleInputBox() {
-    var text by remember { mutableStateOf("") }
-
+    // auto shows original first alarm name in the text field
+    var text by remember {
+        mutableStateOf("${firstAlarm.title}")
+    }
         TextField(
             value = text,
             onValueChange = {
@@ -250,7 +261,74 @@ fun AlarmTitleInputBox() {
                 firstAlarm.title = text },
             placeholder = { Text("Add Title") },
             maxLines = 1,
-            textStyle = TextStyle(color = Dark_Purple, fontWeight = FontWeight.Medium),
+            textStyle = TextStyle(
+                color = Dark_Purple,
+                fontWeight = FontWeight.Medium
+            ),
             modifier = Modifier.padding(5.dp)
         )
+}
+
+@Preview
+@Composable
+
+fun ScrollBoxesSmooth() {
+    // Smoothly scroll 100px on first composition
+    val state = rememberScrollState()
+    LaunchedEffect(Unit) { state.animateScrollTo(100) }
+
+    Column(
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxSize()
+            .padding(vertical = 20.dp)
+            .verticalScroll(state)
+    ) {
+        for(i in 1..12) {
+            Text("$i", modifier = Modifier.padding(12.dp))
+        }
+    }
+}
+
+@Composable
+fun HourPicker(selectedHour: Int, onHourSelected: (Int) -> Unit) {
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                NumberPicker(context).apply {
+                    minValue = 1 // Minimum hour value
+                    maxValue = 12 // Maximum hour value
+                    value = selectedHour // Initial selected hour
+                    textSize = 70f
+                    textColor = 4281802289.toInt()
+                    setOnValueChangedListener { _, _, newVal ->
+                        onHourSelected(newVal) // Notify when hour selected
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Composable
+fun MinutePicker(selectedMinute: Int, onMinuteSelected: (Int) -> Unit) {
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                NumberPicker(context).apply {
+                    minValue = 0 // Minimum minute value
+                    maxValue = 59 // Maximum minute value
+                    value = selectedMinute // Initial selected minute
+                    textSize = 70f
+                    textColor = 4281802289.toInt()
+
+                    setOnValueChangedListener { _, _, newVal ->
+                        onMinuteSelected(newVal) // Notify when minute selected
+                    }
+                }
+            }
+        )
+    }
 }
