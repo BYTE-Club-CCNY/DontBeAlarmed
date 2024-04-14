@@ -19,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -41,8 +42,13 @@ import androidx.constraintlayout.widget.ConstraintSet
 import com.example.myapplication.ui.theme.Light_Gray
 import com.example.myapplication.ui.theme.Soft_Purple
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.TextStyle
+import com.example.myapplication.ui.theme.Alarm
+import androidx.compose.ui.text.input.TextFieldValue
 import com.example.myapplication.ui.theme.Sunset_Orange
 
+
+val firstAlarm = Alarm(1, true, 1, 0)
 
 class AlarmSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,20 +91,14 @@ fun SettingsPage () {
             modifier = Modifier
                 .clip(RoundedCornerShape(50.dp))
                 .width(300.dp)
-                .height(40.dp)
+                .height(80.dp)
                 .constrainAs(titleBox) {
                     top.linkTo(blankBox.bottom, margin = 25.dp)
                 }
-                .background(Color.White)
+                .background(Color.Transparent)
                 .padding(all = 5.dp)
         ) {
-            Text(
-                text = "Add Title",
-                color = Light_Gray,
-                fontSize = 20.sp,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Light
-            )
+            AlarmTitleInputBox()
         }
         //section to input time values
         Box(
@@ -229,7 +229,7 @@ fun SettingsPage () {
             Row{
                 Text(
                     text = "Snooze",
-                    
+
                     color = Dark_Purple,
                     fontSize = 20.sp,
                     fontFamily = fontFamily,
@@ -239,3 +239,18 @@ fun SettingsPage () {
     }
 }
 
+@Composable
+fun AlarmTitleInputBox() {
+    var text by remember { mutableStateOf("") }
+
+        TextField(
+            value = text,
+            onValueChange = {
+                text = it
+                firstAlarm.title = text },
+            placeholder = { Text("Add Title") },
+            maxLines = 1,
+            textStyle = TextStyle(color = Dark_Purple, fontWeight = FontWeight.Medium),
+            modifier = Modifier.padding(5.dp)
+        )
+}
