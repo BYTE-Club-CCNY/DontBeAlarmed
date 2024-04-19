@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,6 +50,7 @@ import com.example.myapplication.ui.theme.Sunset_Orange
 
 var firstAlarm = Alarm(1, true, 1, 0)
 var tempAlarm = Alarm(0,true,0,0)
+
 class AlarmSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,18 +79,16 @@ fun SettingsPage () {
                 .padding(top = 60.dp)
                 .padding(horizontal = 20.dp)
         ) {
-            Column(){
-                SaveButton()
+            Column(horizontalAlignment = AbsoluteAlignment.Right) {
                 Text(
                     text = "Next Alarm in: ...",
                     color = Dark_Purple,
                     fontSize = 45.sp,
                     fontFamily = fontFamily,
                     fontWeight = FontWeight.Medium
-
                 )
+                SaveButton()
             }
-
         }
         //section to input title for alarm
         Box(
@@ -122,6 +122,7 @@ fun SettingsPage () {
                 //hours
                 var selectedHour by remember { mutableStateOf(1) }
                 var selectedMinute by remember { mutableStateOf(0) }
+                var selectedPeriod by remember { mutableStateOf(1) }
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -136,13 +137,6 @@ fun SettingsPage () {
                             selectedHour = hour
                             tempAlarm.hour = selectedHour
                         })
-//                    Text(
-//                        text = "00",
-//                        color = Light_Gray,
-//                        fontSize = 45.sp,
-//                        fontFamily = fontFamily,
-//                        fontWeight = FontWeight.Light
-//                    )
                 }
                 Text(
                     text = ":",
@@ -164,14 +158,21 @@ fun SettingsPage () {
                             selectedMinute = minute
                             tempAlarm.minute = selectedMinute
                         })
-//                    Text(
-//                        text = "00",
-//                        color = Light_Gray,
-//                        fontSize = 45.sp,
-//                        fontFamily = fontFamily,
-//                        fontWeight = FontWeight.Light)
                 }
-
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(25.dp))
+                        .background(Color.White)
+                        .width(70.dp)
+                        .height(100.dp)
+                ){
+                    DayPeriodPicker(
+                        selectedPeriod = tempAlarm.period,
+                        onPeriodSelected = { period ->
+                            selectedPeriod = period
+                            tempAlarm.period = selectedPeriod
+                        })
+                }
             }
         }
         //section for week
@@ -248,6 +249,7 @@ fun SettingsPage () {
                     fontSize = 20.sp,
                     fontFamily = fontFamily,
                     fontWeight = FontWeight.Bold)
+                SoundButtons()
             }
         }
         // section to customize snooze duration and quantity
@@ -310,7 +312,48 @@ fun ActivityButton() {
         contentPadding = PaddingValues(0.dp),
         modifier = Modifier
             .height(40.dp)
-            .width(100.dp))}
+            .width(80.dp))
+}
+
+@Composable
+fun SoundButtons() {
+    for(i in 1..3) {
+        Button(
+            content = {
+                Text(
+                    text = "Sound $i",
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            ),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
+                            )
+                        )
+                    ),
+                    color = Dark_Purple,
+                    fontSize = 12.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            onClick =
+            {
+                tempAlarm.sound = i
+            },
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Dandelion,
+                contentColor = Dark_Purple,
+            ),
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier
+                .height(40.dp)
+                .width(70.dp))}
+    }
+
 
 @Composable
 fun SaveButton() {
@@ -451,11 +494,36 @@ fun MinutePicker(selectedMinute: Int, onMinuteSelected: (Int) -> Unit) {
                     setOnValueChangedListener { _, _, newVal ->
                         onMinuteSelected(newVal) // Notify when minute selected
                     }
+                    setFormatter(NumberPicker.Formatter { i -> String.format("%02d", i) })
                 }
             }
         )
     }
 }
+
+@Composable
+fun DayPeriodPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
+    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        AndroidView(
+            modifier = Modifier.fillMaxWidth(),
+            factory = { context ->
+                NumberPicker(context).apply {
+                    minValue = 1 // am value
+                    maxValue = 2 // pm value
+                    value = selectedPeriod // Initial selected period
+                    textSize = 70f
+                    textColor = 4281802289.toInt()
+                    setOnValueChangedListener { _, _, newVal ->
+                        onPeriodSelected(newVal) // Notify when period selected
+                    }
+                    val periods = arrayOf("AM", "PM")
+                    displayedValues = periods
+                }
+            }
+        )
+    }
+}
+
 
 fun WeekDayConvert (weekDay: Int): String {
     var dayNumber = ""
