@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.media.MediaPlayer
+import android.content.Intent
 import android.os.Bundle
 import android.widget.NumberPicker
 import androidx.activity.ComponentActivity
@@ -64,266 +65,229 @@ class AlarmSettings : ComponentActivity() {
             SettingsPage()
         }
     }
-}
 
-@Preview
-@Composable
-fun SettingsPage () {
-    ConstraintLayout {
-        //header notifying next alarm time
-        val (blankBox, titleBox, timeBox, weekBox, activityBox, soundBox, snoozeBox) = createRefs()
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(225.dp)
-                .constrainAs(blankBox) {}
-                .background(Color.Transparent)
-                .padding(top = 60.dp)
-                .padding(horizontal = 20.dp)
-        ) {
-            Column(horizontalAlignment = AbsoluteAlignment.Right) {
-                Text(
-                    text = "Next Alarm in: ...",
-                    color = Dark_Purple,
-                    fontSize = 45.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold
-                )
-                SaveButton()
-            }
-        }
-        //section to input title for alarm
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(50.dp))
-                .width(300.dp)
-                .height(60.dp)
-                .constrainAs(titleBox) {
-                    // change to 25 margin once i figure out textfield formatting
-                    top.linkTo(blankBox.bottom, margin = 10.dp)
-                }
-                // change to White once i figure out textfield formatting
-                .background(Color.Transparent)
-        ) {
-            AlarmTitleInputBox()
-        }
-        //section to input time values
-        Box(
-            modifier = Modifier
-                .width(300.dp)
-                .height(100.dp)
-                .constrainAs(timeBox) {
-                    // change to 25 margin once i figure out textfield formatting
-                    top.linkTo(titleBox.bottom, margin = 10.dp)
-                }
-                .background(Color.Transparent)
-                .padding(all = 5.dp)
-        )
-        {
-            Row{
-                //hours
-                var selectedHour by remember { mutableStateOf(1) }
-                var selectedMinute by remember { mutableStateOf(0) }
-                var selectedPeriod by remember { mutableStateOf(1) }
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(25.dp))
-                        .background(Color.White)
-                        .width(70.dp)
-                        .height(100.dp)
-                ) {
-                    HourPicker(
-                        selectedHour = tempAlarm.hour,
-                        onHourSelected = { hour ->
-                            selectedHour = hour
-                            tempAlarm.hour = selectedHour
-                        })
-                }
-                Text(
-                    text = ":",
-                    color = Light_Gray,
-                    fontSize = 45.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Light)
-                //minutes
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(25.dp))
-                        .background(Color.White)
-                        .width(70.dp)
-                        .height(100.dp)
-                ){
-                    MinutePicker(
-                        selectedMinute = tempAlarm.minute,
-                        onMinuteSelected = { minute ->
-                            selectedMinute = minute
-                            tempAlarm.minute = selectedMinute
-                        })
-                }
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(25.dp))
-                        .background(Color.White)
-                        .width(70.dp)
-                        .height(100.dp)
-                ){
-                    DayPeriodPicker(
-                        selectedPeriod = tempAlarm.period,
-                        onPeriodSelected = { period ->
-                            selectedPeriod = period
-                            tempAlarm.period = selectedPeriod
-                        })
-                }
-            }
-        }
-        //section for week
-        Box(
-            modifier = Modifier
-                .width(300.dp)
-                .height(60.dp)
-                .constrainAs(weekBox) {
-                    top.linkTo(timeBox.bottom, margin = 25.dp)
-                }
-                .background(Sunset_Orange)
-                .padding(all = 5.dp)
-        )
-        {
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically,
+    @Composable
+    fun SettingsPage() {
+        ConstraintLayout {
+            //header notifying next alarm time
+            val (blankBox, titleBox, timeBox, weekBox, activityBox, soundBox, snoozeBox) = createRefs()
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .height(225.dp)
+                    .constrainAs(blankBox) {}
                     .background(Color.Transparent)
+                    .padding(top = 60.dp)
+                    .padding(horizontal = 20.dp)
+            ) {
+                Column(horizontalAlignment = AbsoluteAlignment.Right) {
+                    Text(
+                        text = "Next Alarm in: ...",
+                        color = Dark_Purple,
+                        fontSize = 45.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Medium
+                    )
+                    SaveButton()
+                }
+            }
+            //section to input title for alarm
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50.dp))
+                    .width(300.dp)
+                    .height(60.dp)
+                    .constrainAs(titleBox) {
+                        // change to 25 margin once i figure out textfield formatting
+                        top.linkTo(blankBox.bottom, margin = 10.dp)
+                    }
+                    // change to White once i figure out textfield formatting
+                    .background(Color.Transparent)
+            ) {
+                AlarmTitleInputBox()
+            }
+            //section to input time values
+            Box(
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(100.dp)
+                    .constrainAs(timeBox) {
+                        // change to 25 margin once i figure out textfield formatting
+                        top.linkTo(titleBox.bottom, margin = 10.dp)
+                    }
+                    .background(Color.Transparent)
+                    .padding(all = 5.dp)
             )
             {
-                WeekDayButton()
+                Row {
+                    //hours
+                    var selectedHour by remember { mutableStateOf(1) }
+                    var selectedMinute by remember { mutableStateOf(0) }
+                    var selectedPeriod by remember { mutableStateOf(1) }
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(25.dp))
+                            .background(Color.White)
+                            .width(70.dp)
+                            .height(100.dp)
+                    ) {
+                        HourPicker(
+                            selectedHour = tempAlarm.hour,
+                            onHourSelected = { hour ->
+                                selectedHour = hour
+                                tempAlarm.hour = selectedHour
+                            })
+                    }
+                    Text(
+                        text = ":",
+                        color = Light_Gray,
+                        fontSize = 45.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Light
+                    )
+                    //minutes
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(25.dp))
+                            .background(Color.White)
+                            .width(70.dp)
+                            .height(100.dp)
+                    ) {
+                        MinutePicker(
+                            selectedMinute = tempAlarm.minute,
+                            onMinuteSelected = { minute ->
+                                selectedMinute = minute
+                                tempAlarm.minute = selectedMinute
+                            })
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(25.dp))
+                            .background(Color.White)
+                            .width(70.dp)
+                            .height(100.dp)
+                    ) {
+                        DayPeriodPicker(
+                            selectedPeriod = tempAlarm.period,
+                            onPeriodSelected = { period ->
+                                selectedPeriod = period
+                                tempAlarm.period = selectedPeriod
+                            })
+                    }
+                }
             }
+            //section for week
+            Box(
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(60.dp)
+                    .constrainAs(weekBox) {
+                        top.linkTo(timeBox.bottom, margin = 25.dp)
+                    }
+                    .background(Sunset_Orange)
+                    .padding(all = 5.dp)
+            )
+            {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Transparent)
+                )
+                {
+                    WeekDayButton()
+                }
 //            Text(
 //                text = "SMTWTFS",
 //                color = Dark_Purple,
 //                fontSize = 40.sp,
 //                fontFamily = fontFamily,
 //                fontWeight = FontWeight.Bold)
-        }
-        // section for activity selection
-        Box(
-            modifier = Modifier
-                .width(300.dp)
-                .height(60.dp)
-                .constrainAs(activityBox) {
-                    top.linkTo(weekBox.bottom, margin = 25.dp)
-                }
-                .background(Sunset_Orange)
-                .padding(all = 5.dp)
-        )
-        {
-            Row(verticalAlignment = Alignment.CenterVertically){
-                Text(
-                    text = "Activity",
-                    color = Dark_Purple,
-                    fontSize = 20.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier
-                    .width(30.dp)
+            }
+            // section for activity selection
+            Box(
+                modifier = Modifier
+                    .width(300.dp)
                     .height(60.dp)
-                )
-                ActivityButton()
-            }
-        }
-        // section for sound selection
-        Box(
-            modifier = Modifier
-                .width(300.dp)
-                .height(60.dp)
-                .constrainAs(soundBox) {
-                    top.linkTo(activityBox.bottom, margin = 25.dp)
+                    .constrainAs(activityBox) {
+                        top.linkTo(weekBox.bottom, margin = 25.dp)
+                    }
+                    .background(Sunset_Orange)
+                    .padding(all = 5.dp)
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Activity",
+                        color = Dark_Purple,
+                        fontSize = 20.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(
+                        modifier = Modifier
+                            .width(30.dp)
+                            .height(60.dp)
+                    )
+                    ActivityButton()
                 }
-                .background(Sunset_Orange)
-                .padding(all = 5.dp)
-        )
-        {
-            Row(verticalAlignment = Alignment.CenterVertically){
-                Text(
-                    text = "Sound",
-                    color = Dark_Purple,
-                    fontSize = 20.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold)
-                SoundButtons()
             }
-        }
-        // section to customize snooze duration and quantity
-        Box(
-            modifier = Modifier
-                .width(300.dp)
-                .height(75.dp)
-                .constrainAs(snoozeBox) {
-                    top.linkTo(soundBox.bottom, margin = 25.dp)
+            // section for sound selection
+            Box(
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(60.dp)
+                    .constrainAs(soundBox) {
+                        top.linkTo(activityBox.bottom, margin = 25.dp)
+                    }
+                    .background(Sunset_Orange)
+                    .padding(all = 5.dp)
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Sound",
+                        color = Dark_Purple,
+                        fontSize = 20.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                    SoundButtons()
                 }
-                .background(Sunset_Orange)
-                .padding(all = 5.dp)
-        )
-        {
-            Row(verticalAlignment = Alignment.CenterVertically){
-                Text(
-                    text = "Snooze",
-                    color = Dark_Purple,
-                    fontSize = 20.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold)
+            }
+            // section to customize snooze duration and quantity
+            Box(
+                modifier = Modifier
+                    .width(300.dp)
+                    .height(75.dp)
+                    .constrainAs(snoozeBox) {
+                        top.linkTo(soundBox.bottom, margin = 25.dp)
+                    }
+                    .background(Sunset_Orange)
+                    .padding(all = 5.dp)
+            )
+            {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Snooze",
+                        color = Dark_Purple,
+                        fontSize = 20.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
-}
 
-@Composable
-fun ActivityButton() {
-    Button(
-        content = {
-            Text(
-                text = "New",
-                style = LocalTextStyle.current.merge(
-                    TextStyle(
-                        platformStyle = PlatformTextStyle(
-                            includeFontPadding = false
-                        ),
-                        lineHeightStyle = LineHeightStyle(
-                            alignment = LineHeightStyle.Alignment.Center,
-                            trim = LineHeightStyle.Trim.None
-                        )
-                    )
-                ),
-                color = Dark_Purple,
-                fontSize = 15.sp,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold
-            )
-        },
-        onClick =
-        {
-//            val nav = Intent(this, ActivityChoice::class.java)
-//            startActivity(nav)
-        },
-        shape = RoundedCornerShape(20.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Dandelion,
-            contentColor = Dark_Purple,
-        ),
-        contentPadding = PaddingValues(0.dp),
-        modifier = Modifier
-            .height(40.dp)
-            .width(80.dp))
-}
-
-@Composable
-fun SoundButtons() {
-    for(i in 1..3) {
+    @Composable
+    fun ActivityButton() {
         Button(
             content = {
                 Text(
-                    text = "Sound $i",
+                    text = "New",
                     style = LocalTextStyle.current.merge(
                         TextStyle(
                             platformStyle = PlatformTextStyle(
@@ -336,14 +300,15 @@ fun SoundButtons() {
                         )
                     ),
                     color = Dark_Purple,
-                    fontSize = 12.sp,
+                    fontSize = 15.sp,
                     fontFamily = fontFamily,
                     fontWeight = FontWeight.Bold
                 )
             },
             onClick =
             {
-                tempAlarm.sound = i
+                val nav = Intent(this, ActivityChoice::class.java)
+                startActivity(nav)
             },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
@@ -353,8 +318,51 @@ fun SoundButtons() {
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier
                 .height(40.dp)
-                .width(70.dp))}
+                .width(80.dp)
+        )
     }
+
+    @Composable
+    fun SoundButtons() {
+        for (i in 1..3) {
+            Button(
+                content = {
+                    Text(
+                        text = "Sound $i",
+                        style = LocalTextStyle.current.merge(
+                            TextStyle(
+                                platformStyle = PlatformTextStyle(
+                                    includeFontPadding = false
+                                ),
+                                lineHeightStyle = LineHeightStyle(
+                                    alignment = LineHeightStyle.Alignment.Center,
+                                    trim = LineHeightStyle.Trim.None
+                                )
+                            )
+                        ),
+                        color = Dark_Purple,
+                        fontSize = 12.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                onClick =
+                {
+                    tempAlarm.sound = i
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Dandelion,
+                    contentColor = Dark_Purple,
+                ),
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(70.dp)
+            )
+        }
+    }
+}
 
 
 @Composable
