@@ -5,21 +5,24 @@ import android.widget.NumberPicker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,25 +31,29 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.myapplication.ui.theme.Alarm
+import com.example.myapplication.ui.theme.Dandelion
 import com.example.myapplication.ui.theme.Dark_Purple
 import com.example.myapplication.ui.theme.Light_Gray
 import com.example.myapplication.ui.theme.Sunset_Orange
 
 
-val firstAlarm = Alarm(1, true, 1, 0)
-
+var firstAlarm = Alarm(1, true, 1, 0)
+var tempAlarm = Alarm(0,true,0,0)
 class AlarmSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            tempAlarm = firstAlarm
             Background()
             SubHeader()
             Header()
@@ -70,14 +77,18 @@ fun SettingsPage () {
                 .padding(top = 60.dp)
                 .padding(horizontal = 20.dp)
         ) {
-            Text(
-                text = "Next Alarm in: ...",
-                color = Dark_Purple,
-                fontSize = 45.sp,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Medium
+            Column(){
+                SaveButton()
+                Text(
+                    text = "Next Alarm in: ...",
+                    color = Dark_Purple,
+                    fontSize = 45.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Medium
 
-            )
+                )
+            }
+
         }
         //section to input title for alarm
         Box(
@@ -120,10 +131,10 @@ fun SettingsPage () {
                         .height(100.dp)
                 ) {
                     HourPicker(
-                        selectedHour = selectedHour,
+                        selectedHour = tempAlarm.hour,
                         onHourSelected = { hour ->
                             selectedHour = hour
-                            firstAlarm.hour = selectedHour
+                            tempAlarm.hour = selectedHour
                         })
 //                    Text(
 //                        text = "00",
@@ -148,10 +159,10 @@ fun SettingsPage () {
                         .height(100.dp)
                 ){
                     MinutePicker(
-                        selectedMinute = selectedMinute,
+                        selectedMinute = tempAlarm.minute,
                         onMinuteSelected = { minute ->
                             selectedMinute = minute
-                            firstAlarm.minute = selectedMinute
+                            tempAlarm.minute = selectedMinute
                         })
 //                    Text(
 //                        text = "00",
@@ -175,12 +186,22 @@ fun SettingsPage () {
                 .padding(all = 5.dp)
         )
         {
-            Text(
-                text = "SMTWTFS",
-                color = Dark_Purple,
-                fontSize = 40.sp,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Bold)
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
+            )
+            {
+                WeekDayButton()
+            }
+//            Text(
+//                text = "SMTWTFS",
+//                color = Dark_Purple,
+//                fontSize = 40.sp,
+//                fontFamily = fontFamily,
+//                fontWeight = FontWeight.Bold)
         }
         // section for activity selection
         Box(
@@ -194,13 +215,18 @@ fun SettingsPage () {
                 .padding(all = 5.dp)
         )
         {
-            Row{
+            Row(verticalAlignment = Alignment.CenterVertically){
                 Text(
-                    text = "Activities",
+                    text = "Activity",
                     color = Dark_Purple,
                     fontSize = 20.sp,
                     fontFamily = fontFamily,
                     fontWeight = FontWeight.Bold)
+                Spacer(modifier = Modifier
+                    .width(30.dp)
+                    .height(60.dp)
+                )
+                ActivityButton()
             }
         }
         // section for sound selection
@@ -215,7 +241,7 @@ fun SettingsPage () {
                 .padding(all = 5.dp)
         )
         {
-            Row{
+            Row(verticalAlignment = Alignment.CenterVertically){
                 Text(
                     text = "Sound",
                     color = Dark_Purple,
@@ -236,7 +262,7 @@ fun SettingsPage () {
                 .padding(all = 5.dp)
         )
         {
-            Row{
+            Row(verticalAlignment = Alignment.CenterVertically){
                 Text(
                     text = "Snooze",
                     color = Dark_Purple,
@@ -249,16 +275,135 @@ fun SettingsPage () {
 }
 
 @Composable
+fun ActivityButton() {
+    Button(
+        content = {
+            Text(
+                text = "New",
+                style = LocalTextStyle.current.merge(
+                    TextStyle(
+                        platformStyle = PlatformTextStyle(
+                            includeFontPadding = false
+                        ),
+                        lineHeightStyle = LineHeightStyle(
+                            alignment = LineHeightStyle.Alignment.Center,
+                            trim = LineHeightStyle.Trim.None
+                        )
+                    )
+                ),
+                color = Dark_Purple,
+                fontSize = 15.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        onClick =
+        {
+//            val nav = Intent(this, ActivityChoice::class.java)
+//            startActivity(nav)
+        },
+        shape = RoundedCornerShape(20.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Dandelion,
+            contentColor = Dark_Purple,
+        ),
+        contentPadding = PaddingValues(0.dp),
+        modifier = Modifier
+            .height(40.dp)
+            .width(100.dp))}
+
+@Composable
+fun SaveButton() {
+    Button(
+        content = {
+            Text(
+                text = "Save",
+                style = LocalTextStyle.current.merge(
+                    TextStyle(
+                        platformStyle = PlatformTextStyle(
+                            includeFontPadding = false
+                        ),
+                        lineHeightStyle = LineHeightStyle(
+                            alignment = LineHeightStyle.Alignment.Center,
+                            trim = LineHeightStyle.Trim.None
+                        )
+                    )
+                ),
+                color = Dark_Purple,
+                fontSize = 15.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.Light
+            )
+        },
+        onClick =
+        {
+            firstAlarm = tempAlarm
+        },
+        shape = RoundedCornerShape(20.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Dandelion,
+            contentColor = Dark_Purple,
+        ),
+        contentPadding = PaddingValues(0.dp),
+        modifier = Modifier
+            .height(40.dp)
+            .width(40.dp))
+}
+
+@Composable
+fun WeekDayButton() {
+    for(i in 1..7) {
+        val button = Button(
+            content = {
+                Text(
+                    text = WeekDayConvert(i),
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            ),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
+                            )
+                        )
+                    ),
+                    fontSize = 15.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Light
+                )
+            },
+            onClick =
+            {
+                if (tempAlarm.weekDays[i]) {
+                    tempAlarm.weekDays[i] = false
+                } else
+                    tempAlarm.weekDays[i] = true
+            },
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Dark_Purple,
+                contentColor = Dandelion,
+            ),
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier
+                .height(40.dp)
+                .width(40.dp)
+        )
+        }
+    }
+
+@Composable
 fun AlarmTitleInputBox() {
     // auto shows original first alarm name in the text field
     var text by remember {
-        mutableStateOf("${firstAlarm.title}")
+        mutableStateOf("${tempAlarm.title}")
     }
         TextField(
             value = text,
             onValueChange = {
                 text = it
-                firstAlarm.title = text },
+                tempAlarm.title = text },
             placeholder = { Text("Add Title") },
             maxLines = 1,
             textStyle = TextStyle(
@@ -267,27 +412,6 @@ fun AlarmTitleInputBox() {
             ),
             modifier = Modifier.padding(5.dp)
         )
-}
-
-@Preview
-@Composable
-
-fun ScrollBoxesSmooth() {
-    // Smoothly scroll 100px on first composition
-    val state = rememberScrollState()
-    LaunchedEffect(Unit) { state.animateScrollTo(100) }
-
-    Column(
-        modifier = Modifier
-            .background(Color.White)
-            .fillMaxSize()
-            .padding(vertical = 20.dp)
-            .verticalScroll(state)
-    ) {
-        for(i in 1..12) {
-            Text("$i", modifier = Modifier.padding(12.dp))
-        }
-    }
 }
 
 @Composable
@@ -331,4 +455,23 @@ fun MinutePicker(selectedMinute: Int, onMinuteSelected: (Int) -> Unit) {
             }
         )
     }
+}
+
+fun WeekDayConvert (weekDay: Int): String {
+    var dayNumber = ""
+    if (weekDay == 1)
+        dayNumber = "S"
+    if (weekDay == 2)
+        dayNumber = "M"
+    if (weekDay == 3)
+        dayNumber = "T"
+    if (weekDay == 4)
+        dayNumber = "W"
+    if (weekDay == 5)
+        dayNumber = "T"
+    if (weekDay == 6)
+        dayNumber = "F"
+    if (weekDay == 7)
+        dayNumber = "S"
+    return dayNumber
 }
