@@ -1,7 +1,7 @@
 package com.example.myapplication
 
-import android.media.MediaPlayer
 import android.content.Intent
+import android.media.MediaPlayer
 import android.os.Bundle
 import android.widget.NumberPicker
 import androidx.activity.ComponentActivity
@@ -66,6 +66,7 @@ class AlarmSettings : ComponentActivity() {
         }
     }
 
+    @Preview
     @Composable
     fun SettingsPage() {
         ConstraintLayout {
@@ -324,7 +325,11 @@ class AlarmSettings : ComponentActivity() {
 
     @Composable
     fun SoundButtons() {
+        var selectedSound by remember { mutableStateOf(tempAlarm.sound) }
         for (i in 1..3) {
+            var selected = selectedSound == i
+            val color = if (!selected) Dark_Purple else Dandelion//off else on
+            val textColor = if (!selected) Dandelion else Dark_Purple //off else on
             Button(
                 content = {
                     Text(
@@ -340,7 +345,7 @@ class AlarmSettings : ComponentActivity() {
                                 )
                             )
                         ),
-                        color = Dark_Purple,
+                        color = textColor,
                         fontSize = 12.sp,
                         fontFamily = fontFamily,
                         fontWeight = FontWeight.Bold
@@ -348,12 +353,12 @@ class AlarmSettings : ComponentActivity() {
                 },
                 onClick =
                 {
-                    tempAlarm.sound = i
+                    selectedSound = i
+                    tempAlarm.sound = selectedSound
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Dandelion,
-                    contentColor = Dark_Purple,
+                    containerColor = color,
                 ),
                 contentPadding = PaddingValues(0.dp),
                 modifier = Modifier
@@ -402,13 +407,12 @@ fun SaveButton() {
             .height(40.dp)
             .width(40.dp))
 }
-@Preview
 @Composable
 fun WeekDayButtons() {
     for(i in 1..7) {
-        var selected by remember { mutableStateOf(false) }
-        val color = if (selected) Color(4281802289) else Color.Yellow//colorchange
-        val textColor = if (selected) Color.DarkGray else Color.Cyan //colorchange
+        var selected by remember { mutableStateOf(tempAlarm.weekDays[i]) }
+        val color = if (selected) Dark_Purple else Dandelion//colorchange
+        val textColor = if (selected) Dandelion else Dark_Purple //colorchange
         Button(
             content = {
                 Text(
@@ -422,21 +426,18 @@ fun WeekDayButtons() {
                                 alignment = LineHeightStyle.Alignment.Center,
                                 trim = LineHeightStyle.Trim.None
                             ),
-                            color = textColor 
+                            color = textColor
                         )
                     ),
                     fontSize = 15.sp,
                     fontFamily = fontFamily,
-                    fontWeight = FontWeight.Light
+                    fontWeight = FontWeight.Medium
                 )
             },
             onClick =
             {
                 selected = !selected
-                if (tempAlarm.weekDays[i]) {
-                    tempAlarm.weekDays[i] = false
-                } else
-                    tempAlarm.weekDays[i] = true
+                tempAlarm.weekDays[i] = selected
             },
             colors= ButtonDefaults.buttonColors(containerColor = color),
             shape = RoundedCornerShape(20.dp),
