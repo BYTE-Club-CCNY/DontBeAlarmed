@@ -44,6 +44,9 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.example.myapplication.ui.theme.Alarm
 import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.ui.Alignment
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,12 +59,17 @@ class MainActivity : ComponentActivity() {
             ConstraintBoxes()
         }
     }
-
+    @Preview
     @Composable
     fun ConstraintBoxes() {
         ConstraintLayout {
-            //add a button creating a new alarm
-            val (blankBox, scrollBox) = createRefs()
+            val (blankBox, scrollBox, saveButton) = createRefs()
+            Box(
+                modifier = Modifier
+                    .constrainAs(saveButton) {}
+            ) {
+
+            }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -92,7 +100,51 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @Preview
+    @Composable
+    fun SaveButton(){
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(
+                onClick = {
+                    val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
+                    startActivity(navigate)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(4284563290),
+                    contentColor = Color(4281802289)
+                ),
+                modifier = Modifier
+                    .padding(10.dp)
+                    .height(30.dp)
+                    .width(75.dp)
+
+            ) {
+
+                Text(
+                    text = "+",
+                    fontSize = 20.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Bold,
+                    color = Dark_Purple,
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            ),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
+                            )
+                        )
+                    ),
+                )
+
+            }
+        }
+    }
+
     @Composable
     fun ScrollButtons() {
         val state = rememberScrollState()

@@ -197,7 +197,7 @@ class AlarmSettings : ComponentActivity() {
                         .background(Color.Transparent)
                 )
                 {
-                    WeekDayButton()
+                    WeekDayButtons()
                 }
 //            Text(
 //                text = "SMTWTFS",
@@ -402,11 +402,14 @@ fun SaveButton() {
             .height(40.dp)
             .width(40.dp))
 }
-
+@Preview
 @Composable
-fun WeekDayButton() {
+fun WeekDayButtons() {
     for(i in 1..7) {
-        val button = Button(
+        var selected by remember { mutableStateOf(false) }
+        val color = if (selected) Color(4281802289) else Color.Yellow//colorchange
+        val textColor = if (selected) Color.DarkGray else Color.Cyan //colorchange
+        Button(
             content = {
                 Text(
                     text = WeekDayConvert(i),
@@ -418,7 +421,8 @@ fun WeekDayButton() {
                             lineHeightStyle = LineHeightStyle(
                                 alignment = LineHeightStyle.Alignment.Center,
                                 trim = LineHeightStyle.Trim.None
-                            )
+                            ),
+                            color = textColor 
                         )
                     ),
                     fontSize = 15.sp,
@@ -428,23 +432,21 @@ fun WeekDayButton() {
             },
             onClick =
             {
+                selected = !selected
                 if (tempAlarm.weekDays[i]) {
                     tempAlarm.weekDays[i] = false
                 } else
                     tempAlarm.weekDays[i] = true
             },
+            colors= ButtonDefaults.buttonColors(containerColor = color),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Dark_Purple,
-                contentColor = Dandelion,
-            ),
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier
                 .height(40.dp)
                 .width(40.dp)
         )
-        }
     }
+}
 
 @Composable
 fun AlarmTitleInputBox() {
