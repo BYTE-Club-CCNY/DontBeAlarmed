@@ -64,6 +64,7 @@ class AlarmSettings : ComponentActivity() {
             Header()
             SettingsPage()
         }
+        mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
     }
 
     @Preview
@@ -330,7 +331,7 @@ class AlarmSettings : ComponentActivity() {
             var selected = selectedSound == i
             val color = if (!selected) Dark_Purple else Dandelion//off else on
             val textColor = if (!selected) Dandelion else Dark_Purple //off else on
-            Button(
+            val abutton = Button(
                 content = {
                     Text(
                         text = "Sound $i",
@@ -353,6 +354,11 @@ class AlarmSettings : ComponentActivity() {
                 },
                 onClick =
                 {
+                    if (mediaPlayer.isPlaying){
+                        mediaPlayer.pause()
+                        mediaPlayer.seekTo(0)
+                    }
+                    mediaPlayer.start()
                     selectedSound = i
                     tempAlarm.sound = selectedSound
                 },
@@ -363,11 +369,15 @@ class AlarmSettings : ComponentActivity() {
                 contentPadding = PaddingValues(0.dp),
                 modifier = Modifier
                     .height(40.dp)
-                    .width(70.dp)
-            )
+                    .width(70.dp))
+
+                }
         }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
-}
+    }
 
 
 @Composable
@@ -556,3 +566,5 @@ fun WeekDayConvert (weekDay: Int): String {
         dayNumber = "S"
     return dayNumber
 }
+
+
