@@ -57,12 +57,31 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.ComposeCompilerApi
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
-
-class ActivityChoice : ComponentActivity() {
+class ButtonData : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Text(text = "ActivityChoice")
+            val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
+            ButtonID(idNum = buttonIndex)
+        }
+    }
+    @Composable
+    fun ButtonID(idNum: Int) {
+        if (idNum != -1) {
+            when (idNum) {
+                1 -> {
+                    println("Hello")
+                }
+
+                2 -> {
+                    val intent = Intent(this, ActivityChoice::class.java)
+                    startActivity(intent)
+                }
+                3 -> {
+                    val intent = Intent(this, AlarmSettings::class.java)
+                    startActivity(intent)
+                }
+            }
         }
     }
 }

@@ -46,7 +46,12 @@ import com.example.myapplication.ui.theme.Alarm
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
+import com.example.myapplication.ui.theme.Dandelion
+import com.example.myapplication.ui.theme.Soft_Purple
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,21 +64,45 @@ class MainActivity : ComponentActivity() {
             ConstraintBoxes()
         }
     }
-    @Preview
+
     @Composable
     fun ConstraintBoxes() {
         ConstraintLayout {
             val (blankBox, scrollBox, saveButton) = createRefs()
             Box(
+                contentAlignment = Alignment.TopEnd,
                 modifier = Modifier
                     .constrainAs(saveButton) {}
+                    .background(Color.Transparent)
+                    .height(100.dp)
+                    .fillMaxWidth()
             ) {
-
+                SaveButton()
+                Text(
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            ),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
+                            )
+                        )
+                    ),
+                    text = "+",
+                    color =  Dark_Purple,
+                    fontSize = 35.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier
+                        .padding(end = 31.dp)
+                )
             }
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(225.dp)
+                    .height(220.dp)
                     .constrainAs(blankBox) {}
                     .background(Color.Transparent)
                     .padding(top = 60.dp)
@@ -90,10 +119,10 @@ class MainActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(horizontal = 10.dp)
                     .constrainAs(scrollBox) {
                         top.linkTo(blankBox.bottom, margin = 25.dp)
                     }
-
             ) {
                 ScrollButtons()
             }
@@ -102,47 +131,20 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun SaveButton(){
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
-        ) {
-            Button(
-                onClick = {
-                    val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
-                    startActivity(navigate)
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(4284563290),
-                    contentColor = Color(4281802289)
-                ),
-                modifier = Modifier
-                    .padding(10.dp)
-                    .height(30.dp)
-                    .width(75.dp)
+        Button(
+            onClick = {
+                val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
+                startActivity(navigate)
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(4294019433),
+            ),
+            modifier = Modifier
+                .padding(5.dp)
+                .height(38.dp)
+                .width(75.dp)
 
-            ) {
-
-                Text(
-                    text = "+",
-                    fontSize = 20.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold,
-                    color = Dark_Purple,
-                    style = LocalTextStyle.current.merge(
-                        TextStyle(
-                            platformStyle = PlatformTextStyle(
-                                includeFontPadding = false
-                            ),
-                            lineHeightStyle = LineHeightStyle(
-                                alignment = LineHeightStyle.Alignment.Center,
-                                trim = LineHeightStyle.Trim.None
-                            )
-                        )
-                    ),
-                )
-
-            }
-        }
+        ) {}
     }
 
     @Composable
@@ -156,10 +158,11 @@ class MainActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .verticalScroll(state)
         ) {
-            for(i in 1..12) {
+            for (i in 1..12) {
                 Button(
                     onClick = {
-                        val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
+                        val navigate = Intent(this@MainActivity, ButtonData::class.java)
+                        navigate.putExtra("BUTTON_INDEX", i)
                         startActivity(navigate)
                     },
                     shape = RoundedCornerShape(20.dp),
@@ -169,7 +172,7 @@ class MainActivity : ComponentActivity() {
                     ),
                     modifier = Modifier
                         .height(100.dp)
-                        .fillMaxWidth()
+                        .width(375.dp)
                         .padding(vertical = 6.dp)
                 ) {
                     ConstraintLayout {
@@ -213,13 +216,23 @@ class MainActivity : ComponentActivity() {
                                 }
                         ) {
                             Text(
+                                style = LocalTextStyle.current.merge(
+                                    TextStyle(
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        ),
+                                        lineHeightStyle = LineHeightStyle(
+                                            alignment = LineHeightStyle.Alignment.Center,
+                                            trim = LineHeightStyle.Trim.None
+                                        )
+                                    )
+                                ),
                                 text = " S   M   T   W   T   F   S",
                                 textAlign = TextAlign.Center,
                                 color = Dark_Purple,
                                 fontSize = 15.sp,
                                 fontFamily = fontFamily,
                                 fontWeight = FontWeight.Bold)
-
                         }
                         Box(
                             modifier = Modifier
@@ -256,4 +269,3 @@ fun OnOffButton() {
 
     )
 }
-
