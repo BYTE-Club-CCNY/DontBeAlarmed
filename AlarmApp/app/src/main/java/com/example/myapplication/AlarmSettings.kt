@@ -72,7 +72,8 @@ class AlarmSettings : ComponentActivity() {
     fun SettingsPage() {
         ConstraintLayout {
             //header notifying next alarm time
-            val (blankBox, titleBox, timeBox, weekBox, activityBox, soundBox, snoozeBox) = createRefs()
+            val (blankBox, titleBox, timeBox, optionBox) = createRefs()
+            //blankbox = Header
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -94,11 +95,12 @@ class AlarmSettings : ComponentActivity() {
                 }
             }
             //section to input title for alarm
+            //title box = name of the alarm box
             Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50.dp))
-                    .width(300.dp)
-                    .height(60.dp)
+                    .fillMaxWidth()
+                    .height(75.dp)
                     .constrainAs(titleBox) {
                         // change to 25 margin once i figure out textfield formatting
                         top.linkTo(blankBox.bottom, margin = 10.dp)
@@ -109,181 +111,217 @@ class AlarmSettings : ComponentActivity() {
                 AlarmTitleInputBox()
             }
             //section to input time values
+            //time box = hour, min, am/pm
             Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
-                    .width(300.dp)
+                    .fillMaxWidth()
                     .height(100.dp)
                     .constrainAs(timeBox) {
                         // change to 25 margin once i figure out textfield formatting
                         top.linkTo(titleBox.bottom, margin = 10.dp)
                     }
                     .background(Color.Transparent)
-                    .padding(all = 5.dp)
-            )
-            {
-                Row {
-                    //hours
-                    var selectedHour by remember { mutableStateOf(1) }
-                    var selectedMinute by remember { mutableStateOf(0) }
-                    var selectedPeriod by remember { mutableStateOf(1) }
+            ) {
+                var selectedHour by remember { mutableStateOf(1) }
+                var selectedMinute by remember { mutableStateOf(0) }
+                var selectedPeriod by remember { mutableStateOf(1) }
+                ConstraintLayout {
+                    val (hourBox, colonBox, minuteBox, timeOfDay, spacerBox) = createRefs()
                     Box(
-                        contentAlignment = Alignment.Center,
                         modifier = Modifier
                             .clip(RoundedCornerShape(25.dp))
                             .background(Color.White)
-                            .width(70.dp)
+                            .width(85.dp)
                             .height(100.dp)
+                            .constrainAs(hourBox) {}
+
                     ) {
                         HourPicker(
                             selectedHour = tempAlarm.hour,
                             onHourSelected = { hour ->
                                 selectedHour = hour
                                 tempAlarm.hour = selectedHour
-                            })
+                            }
+                        )
                     }
-                    Text(
-                        text = ":",
-                        color = Light_Gray,
-                        fontSize = 45.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Light
-                    )
-                    //minutes
+                    Box(
+                        modifier = Modifier
+                            .constrainAs(colonBox) {}
+                            .padding(13.dp)
+                    ) {
+                        Text(
+                            text = ":",
+                            color = Dandelion,
+                            fontSize = 45.sp,
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(25.dp))
                             .background(Color.White)
-                            .width(70.dp)
+                            .width(85.dp)
                             .height(100.dp)
+                            .constrainAs(minuteBox) {}
                     ) {
                         MinutePicker(
                             selectedMinute = tempAlarm.minute,
                             onMinuteSelected = { minute ->
                                 selectedMinute = minute
                                 tempAlarm.minute = selectedMinute
-                            })
+                            }
+                        )
+                    }
+                    Box (
+                        modifier = Modifier
+                            .constrainAs(spacerBox) {}
+                    ){
+                        Text(
+                            text = "          "
+                        )
                     }
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(25.dp))
                             .background(Color.White)
-                            .width(70.dp)
+                            .width(85.dp)
                             .height(100.dp)
+                            .constrainAs(timeOfDay) {}
                     ) {
                         DayPeriodPicker(
                             selectedPeriod = tempAlarm.period,
                             onPeriodSelected = { period ->
                                 selectedPeriod = period
                                 tempAlarm.period = selectedPeriod
-                            })
+                            }
+                        )
                     }
+                    createHorizontalChain(hourBox,colonBox,minuteBox,spacerBox, timeOfDay)
                 }
             }
-            //section for week
             Box(
+                contentAlignment = Alignment.TopCenter,
                 modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .constrainAs(weekBox) {
-                        top.linkTo(timeBox.bottom, margin = 25.dp)
+                    .fillMaxSize()
+                    .padding(vertical = 15.dp)
+                    .constrainAs(optionBox) {
+                        top.linkTo(timeBox.bottom, margin = 10.dp)
                     }
-                    .background(Sunset_Orange)
-                    .padding(all = 5.dp)
-            )
-            {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Transparent)
-                )
-                {
-                    WeekDayButtons()
-                }
+            ) {
+                ConstraintLayout {
+                    val (weekBox, activityBox, soundBox, snoozeBox) = createRefs()
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .width(325.dp)
+                            .height(60.dp)
+                            .constrainAs(weekBox) {
+                                bottom.linkTo(activityBox.top, margin = 25.dp)
+                            }
+                            .background(Sunset_Orange)
+                            .padding(all = 5.dp)
+                    )
+                    {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Transparent)
+                        )
+                        {
+                            WeekDayButtons()
+                        }
 //            Text(
 //                text = "SMTWTFS",
 //                color = Dark_Purple,
 //                fontSize = 40.sp,
 //                fontFamily = fontFamily,
 //                fontWeight = FontWeight.Bold)
-            }
-            // section for activity selection
-            Box(
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .constrainAs(activityBox) {
-                        top.linkTo(weekBox.bottom, margin = 25.dp)
                     }
-                    .background(Sunset_Orange)
-                    .padding(all = 5.dp)
-            )
-            {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Activity",
-                        color = Dark_Purple,
-                        fontSize = 20.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(
+                    // section for activity selection
+                    Box(
                         modifier = Modifier
-                            .width(30.dp)
+                            .width(325.dp)
                             .height(60.dp)
+                            .constrainAs(activityBox) {
+                                top.linkTo(weekBox.bottom, margin = 25.dp)
+                            }
+                            .background(Sunset_Orange)
+                            .padding(all = 5.dp)
                     )
-                    ActivityButton()
-                }
-            }
-            // section for sound selection
-            Box(
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(60.dp)
-                    .constrainAs(soundBox) {
-                        top.linkTo(activityBox.bottom, margin = 25.dp)
+                    {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Activity",
+                                color = Dark_Purple,
+                                fontSize = 20.sp,
+                                fontFamily = fontFamily,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .width(30.dp)
+                                    .height(60.dp)
+                            )
+                            ActivityButton()
+                        }
                     }
-                    .background(Sunset_Orange)
-                    .padding(all = 5.dp)
-            )
-            {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Sound",
-                        color = Dark_Purple,
-                        fontSize = 20.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Bold
+                    // section for sound selection
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .width(325.dp)
+                            .height(60.dp)
+                            .constrainAs(soundBox) {
+                                top.linkTo(activityBox.bottom, margin = 25.dp)
+                            }
+                            .background(Sunset_Orange)
+                            .padding(all = 5.dp)
                     )
-                    SoundButtons()
-                }
-            }
-            // section to customize snooze duration and quantity
-            Box(
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(75.dp)
-                    .constrainAs(snoozeBox) {
-                        top.linkTo(soundBox.bottom, margin = 25.dp)
+                    {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Sound",
+                                color = Dark_Purple,
+                                fontSize = 20.sp,
+                                fontFamily = fontFamily,
+                                fontWeight = FontWeight.Bold
+                            )
+                            SoundButtons()
+                        }
                     }
-                    .background(Sunset_Orange)
-                    .padding(all = 5.dp)
-            )
-            {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Snooze",
-                        color = Dark_Purple,
-                        fontSize = 20.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Bold
+                    // section to customize snooze duration and quantity
+                    Box(
+                        modifier = Modifier
+                            .width(325.dp)
+                            .height(60.dp)
+                            .constrainAs(snoozeBox) {
+                                top.linkTo(soundBox.bottom, margin = 25.dp)
+                            }
+                            .background(Sunset_Orange)
+                            .padding(all = 5.dp)
                     )
+                    {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "Snooze",
+                                color = Dark_Purple,
+                                fontSize = 20.sp,
+                                fontFamily = fontFamily,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                 }
             }
+            //section for week
+
         }
     }
-
+@Preview
     @Composable
     fun ActivityButton() {
         Button(
@@ -377,9 +415,9 @@ class AlarmSettings : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
     }
-    }
+}
 
-
+@Preview
 @Composable
 fun SaveButton() {
     Button(
@@ -417,6 +455,7 @@ fun SaveButton() {
             .height(40.dp)
             .width(40.dp))
 }
+@Preview
 @Composable
 fun WeekDayButtons() {
     for(i in 1..7) {
@@ -458,7 +497,7 @@ fun WeekDayButtons() {
         )
     }
 }
-
+@Preview
 @Composable
 fun AlarmTitleInputBox() {
     // auto shows original first alarm name in the text field
@@ -466,6 +505,7 @@ fun AlarmTitleInputBox() {
         mutableStateOf("${tempAlarm.title}")
     }
         TextField(
+            shape = RoundedCornerShape(15.dp),
             value = text,
             onValueChange = {
                 text = it
@@ -476,7 +516,9 @@ fun AlarmTitleInputBox() {
                 color = Dark_Purple,
                 fontWeight = FontWeight.Medium
             ),
-            modifier = Modifier.padding(5.dp)
+            modifier = Modifier
+                .padding(5.dp)
+                .width(325.dp)
         )
 }
 
@@ -545,6 +587,7 @@ fun DayPeriodPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
             }
         )
     }
+
 }
 
 

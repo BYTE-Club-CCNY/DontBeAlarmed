@@ -64,20 +64,20 @@ class MainActivity : ComponentActivity() {
             ConstraintBoxes()
         }
     }
-
+@Preview
     @Composable
     fun ConstraintBoxes() {
         ConstraintLayout {
-            val (blankBox, scrollBox, saveButton) = createRefs()
+            val (blankBox, scrollBox, newAlarm) = createRefs()
             Box(
                 contentAlignment = Alignment.TopEnd,
                 modifier = Modifier
-                    .constrainAs(saveButton) {}
+                    .constrainAs(newAlarm) {}
                     .background(Color.Transparent)
                     .height(100.dp)
                     .fillMaxWidth()
             ) {
-                SaveButton()
+                NewAlarm()
                 Text(
                     style = LocalTextStyle.current.merge(
                         TextStyle(
@@ -130,7 +130,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun SaveButton(){
+    fun NewAlarm(){
         Button(
             onClick = {
                 val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
@@ -146,7 +146,6 @@ class MainActivity : ComponentActivity() {
 
         ) {}
     }
-
     @Composable
     fun ScrollButtons() {
         val state = rememberScrollState()
@@ -178,7 +177,7 @@ class MainActivity : ComponentActivity() {
                     ConstraintLayout {
                         val (textBox, switchButton, daysBox) = createRefs()
                         Box(
-                            modifier = Modifier
+                               modifier = Modifier
                                 .background(Color.Transparent)
                                 .fillMaxWidth(0.75f)
                                 .fillMaxHeight(0.70f)

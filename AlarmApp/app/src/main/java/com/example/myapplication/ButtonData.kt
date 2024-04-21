@@ -63,6 +63,10 @@ class ButtonData : ComponentActivity() {
         setContent {
             val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
             ButtonID(idNum = buttonIndex)
+            LockOrientation()
+            Background()
+            SubHeader()
+            Header()
         }
     }
     @Composable
@@ -70,7 +74,8 @@ class ButtonData : ComponentActivity() {
         if (idNum != -1) {
             when (idNum) {
                 1 -> {
-                    println("Hello")
+                    val intent = Intent(this, AlarmSettings::class.java)
+                    startActivity(intent)
                 }
 
                 2 -> {
