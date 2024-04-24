@@ -90,7 +90,11 @@ class AlarmSettings : ComponentActivity() {
                         fontFamily = fontFamily,
                         fontWeight = FontWeight.Medium
                     )
-                    SaveButton()
+                    Row(){
+                        SaveButton()
+                        BackButton()
+                    }
+
                 }
             }
             //section to input title for alarm
@@ -260,28 +264,67 @@ class AlarmSettings : ComponentActivity() {
                 }
             }
             // section to customize snooze duration and quantity
-            Box(
-                modifier = Modifier
-                    .width(300.dp)
-                    .height(75.dp)
-                    .constrainAs(snoozeBox) {
-                        top.linkTo(soundBox.bottom, margin = 25.dp)
-                    }
-                    .background(Sunset_Orange)
-                    .padding(all = 5.dp)
-            )
-            {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Snooze",
-                        color = Dark_Purple,
-                        fontSize = 20.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
+//            Box(
+//                modifier = Modifier
+//                    .width(300.dp)
+//                    .height(75.dp)
+//                    .constrainAs(snoozeBox) {
+//                        top.linkTo(soundBox.bottom, margin = 25.dp)
+//                    }
+//                    .background(Sunset_Orange)
+//                    .padding(all = 5.dp)
+//            )
+//            {
+//                Row(verticalAlignment = Alignment.CenterVertically) {
+//                    Text(
+//                        text = "Snooze",
+//                        color = Dark_Purple,
+//                        fontSize = 20.sp,
+//                        fontFamily = fontFamily,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                }
+//            }
         }
+    }
+
+    private @Composable
+    fun BackButton() {
+        Button(
+            content = {
+                Text(
+                    text = "Back",
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            platformStyle = PlatformTextStyle(
+                                includeFontPadding = false
+                            ),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
+                            )
+                        )
+                    ),
+                    color = Dark_Purple,
+                    fontSize = 15.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Light
+                )
+            },
+            onClick =
+            {
+                val nav = Intent(this, MainActivity::class.java)
+                startActivity(nav)
+            },
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Dandelion,
+                contentColor = Dark_Purple,
+            ),
+            contentPadding = PaddingValues(0.dp),
+            modifier = Modifier
+                .height(40.dp)
+                .width(40.dp))
     }
 
     @Composable
