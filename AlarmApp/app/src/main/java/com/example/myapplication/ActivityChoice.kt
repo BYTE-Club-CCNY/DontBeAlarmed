@@ -62,7 +62,11 @@ class ActivityChoice : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            Text(text = "ActivityChoice")
+            Text(text = "Activity Choice Page")
+            LockOrientation()
+            Background()
+            SubHeader()
+            Header()
         }
     }
 }
