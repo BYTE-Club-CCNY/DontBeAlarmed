@@ -171,7 +171,7 @@ class MainActivity : ComponentActivity() {
                     ),
                     modifier = Modifier
                         .height(100.dp)
-                        .width(375.dp)
+                        .fillMaxWidth()
                         .padding(vertical = 6.dp)
                 ) {
                     ConstraintLayout {
