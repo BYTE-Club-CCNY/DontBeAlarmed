@@ -64,15 +64,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            var hour by remember { mutableStateOf("0") }
+            var minute by remember { mutableStateOf("0") }
+            var amOrPm by remember { mutableStateOf("0") }
+            val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
+            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
             LockOrientation()
             Background()
             SubHeader()
             Header()
-            ConstraintBoxes()
-            var hour by remember { mutableStateOf("0") }
-            var minute by remember { mutableStateOf("0") }
-            var amOrPm by remember { mutableStateOf("0") }
-            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
+            ConstraintBoxes(hour = hour, minute = minute, amOrPm = amOrPm)
 
             LaunchedEffect(Unit) {
                 while (true) {
@@ -89,18 +90,23 @@ class MainActivity : ComponentActivity() {
                     delay(1000)
                 }
             }
-            if (minute == "13") {
+            val hr = "03"
+            val min = "26"
+            val timeOfDay = "PM"
+            if (hour == hr && minute == min && amOrPm == timeOfDay) {
                 mediaPlayer.start()
                 val intent = Intent(this, MathGame::class.java)
                 startActivity(intent)
             }
-
-            DigitalClockComponent(hour = hour, minute = minute, amOrPm = amOrPm)
         }
     }
-    @Preview
+
     @Composable
-    fun ConstraintBoxes() {
+    fun ConstraintBoxes(
+        hour: String,
+        minute: String,
+        amOrPm: String,
+    ) {
         ConstraintLayout {
             val (blankBox, scrollBox, newAlarm) = createRefs()
             Box(
@@ -134,6 +140,7 @@ class MainActivity : ComponentActivity() {
                 )
             }
             Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(220.dp)
@@ -142,13 +149,7 @@ class MainActivity : ComponentActivity() {
                     .padding(top = 60.dp)
                     .padding(horizontal = 20.dp)
             ) {
-                Text(
-                    text = "Next Alarm in: ...",
-                    color = Dark_Purple,
-                    fontSize = 45.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold
-                )
+                DigitalClockComponent(hour = hour, minute = minute, amOrPm = amOrPm)
             }
             Box(
                 modifier = Modifier
@@ -191,7 +192,7 @@ class MainActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .verticalScroll(state)
         ) {
-            for (i in 1..12) {
+            for (i in 1..9) {
                 Button(
                     onClick = {
                         val navigate = Intent(this@MainActivity, ButtonData::class.java)
@@ -285,7 +286,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun OnOffButton() {
     var checked by remember { mutableStateOf(true) }
-
     Switch(
         checked = checked,
         onCheckedChange = {
@@ -310,6 +310,10 @@ fun DigitalClockComponent(
     amOrPm: String,
 ) {
     Text(
-        text = "$hour:$minute $amOrPm"
+        text = "$hour:$minute $amOrPm",
+        color = Dark_Purple,
+        fontSize = 60.sp,
+        fontFamily = fontFamily,
+        fontWeight = FontWeight.ExtraBold
     )
 }
