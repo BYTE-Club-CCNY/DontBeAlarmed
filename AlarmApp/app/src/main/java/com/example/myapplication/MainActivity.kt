@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.example.myapplication.ui.theme.Alarm
 import android.content.Context
+import android.media.MediaPlayer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.TextField
@@ -71,6 +72,7 @@ class MainActivity : ComponentActivity() {
             var hour by remember { mutableStateOf("0") }
             var minute by remember { mutableStateOf("0") }
             var amOrPm by remember { mutableStateOf("0") }
+            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
 
             LaunchedEffect(Unit) {
                 while (true) {
@@ -84,11 +86,16 @@ class MainActivity : ComponentActivity() {
                     amOrPm = cal.get(Calendar.AM_PM).run {
                         if (this == Calendar.AM) "AM" else "PM"
                     }
-
                     delay(1000)
                 }
             }
+            if (minute == "13") {
+                mediaPlayer.start()
+                val intent = Intent(this, MathGame::class.java)
+                startActivity(intent)
+            }
 
+            DigitalClockComponent(hour = hour, minute = minute, amOrPm = amOrPm)
         }
     }
     @Preview
@@ -205,12 +212,12 @@ class MainActivity : ComponentActivity() {
                         val (textBox, switchButton, daysBox) = createRefs()
                         Box(
                                modifier = Modifier
-                                .background(Color.Transparent)
-                                .fillMaxWidth(0.75f)
-                                .fillMaxHeight(0.70f)
-                                .constrainAs(textBox) {
-                                    bottom.linkTo(daysBox.top)
-                                }
+                                   .background(Color.Transparent)
+                                   .fillMaxWidth(0.75f)
+                                   .fillMaxHeight(0.70f)
+                                   .constrainAs(textBox) {
+                                       bottom.linkTo(daysBox.top)
+                                   }
                         ){
                             Text(
                                 text = "$i:00 PM",
@@ -293,5 +300,16 @@ fun OnOffButton() {
             uncheckedTrackColor = Color(4284563290)
         )
 
+    )
+}
+
+@Composable
+fun DigitalClockComponent(
+    hour: String,
+    minute: String,
+    amOrPm: String,
+) {
+    Text(
+        text = "$hour:$minute $amOrPm"
     )
 }
