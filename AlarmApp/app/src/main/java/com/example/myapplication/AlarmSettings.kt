@@ -523,8 +523,8 @@ fun SaveButton() {
 fun WeekDayButtons() {
     for(i in 1..7) {
         var selected by remember { mutableStateOf(tempAlarm.weekDays[i]) }
-        val color = if (selected) Dark_Purple else Dandelion//colorchange
-        val textColor = if (selected) Dandelion else Dark_Purple //colorchange
+        val color = if (selected) Dandelion else Dark_Purple//colorchange
+        val textColor = if (selected) Dark_Purple else Dandelion //colorchange
         Button(
             content = {
                 Text(
