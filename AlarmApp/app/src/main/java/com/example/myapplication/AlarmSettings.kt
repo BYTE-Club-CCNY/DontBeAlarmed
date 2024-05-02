@@ -60,8 +60,7 @@ class AlarmSettings : ComponentActivity() {
             Background()
             SubHeader()
             Header()
-            SettingsPage()
-        }
+            SettingsPage()        }
         mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
     }
 
