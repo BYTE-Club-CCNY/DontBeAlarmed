@@ -52,6 +52,12 @@ import com.example.myapplication.ui.theme.Dandelion
 import com.example.myapplication.ui.theme.Soft_Purple
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import kotlinx.coroutines.delay
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,9 +68,30 @@ class MainActivity : ComponentActivity() {
             SubHeader()
             Header()
             ConstraintBoxes()
+            var hour by remember { mutableStateOf("0") }
+            var minute by remember { mutableStateOf("0") }
+            var amOrPm by remember { mutableStateOf("0") }
+
+            LaunchedEffect(Unit) {
+                while (true) {
+                    val cal = Calendar.getInstance()
+                    hour = cal.get(Calendar.HOUR).run {
+                        if (this.toString().length == 1) "0$this" else "$this"
+                    }
+                    minute = cal.get(Calendar.MINUTE).run {
+                        if (this.toString().length == 1) "0$this" else "$this"
+                    }
+                    amOrPm = cal.get(Calendar.AM_PM).run {
+                        if (this == Calendar.AM) "AM" else "PM"
+                    }
+
+                    delay(1000)
+                }
+            }
+
         }
     }
-@Preview
+    @Preview
     @Composable
     fun ConstraintBoxes() {
         ConstraintLayout {
