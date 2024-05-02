@@ -50,7 +50,7 @@ import com.example.myapplication.ui.theme.Sunset_Orange
 
 var firstAlarm = Alarm(1, true, 1, 0)
 var tempAlarm = Alarm(0,true,0,0)
-private lateinit var mediaPlayer: MediaPlayer
+internal lateinit var mediaPlayer: MediaPlayer
 
 class AlarmSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
