@@ -42,7 +42,6 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import com.example.myapplication.ui.theme.Alarm
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.compose.foundation.layout.Arrangement
@@ -58,6 +57,9 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Calendar
+import com.example.myapplication.database.readData
+import com.example.myapplication.database.getActiveDays
+
 
 
 class MainActivity : ComponentActivity() {
@@ -185,6 +187,7 @@ class MainActivity : ComponentActivity() {
     fun ScrollButtons() {
         val state = rememberScrollState()
         LaunchedEffect(Unit) { state.animateScrollTo(10) }
+        val alarms = remember { readData(this) }
         Column(
             modifier = Modifier
                 .background(Color(4281802289))
@@ -192,90 +195,91 @@ class MainActivity : ComponentActivity() {
                 .fillMaxWidth()
                 .verticalScroll(state)
         ) {
-            for (i in 1..9) {
-                Button(
-                    onClick = {
-                        val navigate = Intent(this@MainActivity, ButtonData::class.java)
-                        navigate.putExtra("BUTTON_INDEX", i)
-                        startActivity(navigate)
-                    },
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(4284563290),
-                        contentColor = Color(4281802289)
-                    ),
-                    modifier = Modifier
-                        .height(100.dp)
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp)
-                ) {
-                    ConstraintLayout {
-                        val (textBox, switchButton, daysBox) = createRefs()
-                        Box(
-                               modifier = Modifier
-                                   .background(Color.Transparent)
-                                   .fillMaxWidth(0.75f)
-                                   .fillMaxHeight(0.70f)
-                                   .constrainAs(textBox) {
-                                       bottom.linkTo(daysBox.top)
-                                   }
-                        ){
-                            Text(
-                                text = "$i:00 PM",
-                                style = LocalTextStyle.current.merge(
-                                    TextStyle(
-                                        platformStyle = PlatformTextStyle(
-                                            includeFontPadding = false
-                                        ),
-                                        lineHeightStyle = LineHeightStyle(
-                                            alignment = LineHeightStyle.Alignment.Center,
-                                            trim = LineHeightStyle.Trim.None
+            if (alarms != null) {
+                alarms.forEachIndexed { index, alarm ->
+                    val activeDays = getActiveDays(alarm.dayOfWeek)
+                    Button(
+                        onClick = {
+                            val navigate = Intent(this@MainActivity, ButtonData::class.java)
+                            navigate.putExtra("BUTTON_INDEX", index)
+                            startActivity(navigate)
+                        },
+                        shape = RoundedCornerShape(20.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(4284563290),
+                            contentColor = Color(4281802289)
+                        ),
+                        modifier = Modifier
+                            .height(100.dp)
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp)
+                    ) {
+                        ConstraintLayout {
+                            val (textBox, switchButton, daysBox) = createRefs()
+                            Box(
+                                modifier = Modifier
+                                    .background(Color.Transparent)
+                                    .fillMaxWidth(0.75f)
+                                    .fillMaxHeight(0.70f)
+                                    .constrainAs(textBox) {
+                                        bottom.linkTo(daysBox.top)
+                                    }
+                            ){
+                                Text(
+                                    text = "${alarm.hour}:${alarm.minutes} ${alarm.meridiem}",
+                                    style = LocalTextStyle.current.merge(
+                                        TextStyle(
+                                            platformStyle = PlatformTextStyle(
+                                                includeFontPadding = false
+                                            ),
+                                            lineHeightStyle = LineHeightStyle(
+                                                alignment = LineHeightStyle.Alignment.Center,
+                                                trim = LineHeightStyle.Trim.None
+                                            )
                                         )
-                                    )
-                                ),
-                                color = Dark_Purple,
-                                fontSize = 40.sp,
-                                fontFamily = fontFamily,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color(4294493562))
-                                .height(20.dp)
-                                .width(175.dp)
-                                .constrainAs(daysBox) {
-                                    top.linkTo(textBox.bottom)
-                                }
-                        ) {
-                            Text(
-                                style = LocalTextStyle.current.merge(
-                                    TextStyle(
-                                        platformStyle = PlatformTextStyle(
-                                            includeFontPadding = false
-                                        ),
-                                        lineHeightStyle = LineHeightStyle(
-                                            alignment = LineHeightStyle.Alignment.Center,
-                                            trim = LineHeightStyle.Trim.None
+                                    ),
+                                    color = Dark_Purple,
+                                    fontSize = 40.sp,
+                                    fontFamily = fontFamily,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(Color(4294493562))
+                                    .height(20.dp)
+                                    .width(175.dp)
+                                    .constrainAs(daysBox) {
+                                        top.linkTo(textBox.bottom)
+                                    }
+                            ) {
+                                Text(
+                                    style = LocalTextStyle.current.merge(
+                                        TextStyle(
+                                            platformStyle = PlatformTextStyle(includeFontPadding = false),
+                                            lineHeightStyle = LineHeightStyle(
+                                                alignment = LineHeightStyle.Alignment.Center,
+                                                trim = LineHeightStyle.Trim.None
+                                            )
                                         )
-                                    )
-                                ),
-                                text = " S   M   T   W   T   F   S",
-                                textAlign = TextAlign.Center,
-                                color = Dark_Purple,
-                                fontSize = 15.sp,
-                                fontFamily = fontFamily,
-                                fontWeight = FontWeight.Bold)
+                                    ),
+                                    text = activeDays,
+                                    textAlign = TextAlign.Center,
+                                    color = Dark_Purple,
+                                    fontSize = 15.sp,
+                                    fontFamily = fontFamily,
+                                    fontWeight = FontWeight.Bold)
+                            }
+                            Box(
+                                modifier = Modifier
+                                    .padding(15.dp)
+                                    .constrainAs(switchButton) {}
+                            ) {
+                                OnOffButton()
+                            }
+                            createHorizontalChain(textBox,switchButton)
                         }
-                        Box(
-                            modifier = Modifier
-                                .padding(15.dp)
-                                .constrainAs(switchButton) {}
-                        ) {
-                            OnOffButton()
-                        }
-                        createHorizontalChain(textBox,switchButton)
                     }
                 }
             }
