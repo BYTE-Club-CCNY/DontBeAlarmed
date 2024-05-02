@@ -300,7 +300,8 @@ class AlarmSettings : ComponentActivity() {
                                     .height(60.dp)
                             )
                             Box(modifier = Modifier
-                                .fillMaxWidth()
+                                .fillMaxWidth(),
+                                contentAlignment = Alignment.Center
                             )
                             {
                                 Row(){
@@ -328,8 +329,8 @@ class AlarmSettings : ComponentActivity() {
                                 .width(125.dp))
                             SaveButton()
                         }
-            }
-            }
+                    }
+                }
             }
         }
     }
@@ -373,7 +374,7 @@ class AlarmSettings : ComponentActivity() {
                 .width(80.dp))
     }
 
-@Preview
+    @Preview
     @Composable
     fun ActivityButton() {
     var activityText = ""
@@ -425,7 +426,7 @@ class AlarmSettings : ComponentActivity() {
     @Composable
     fun SoundButtons() {
         var selectedSound by remember { mutableStateOf(tempAlarm.sound) }
-        for (i in 1..3) {
+        for (i in 1..2) {
             var selected = selectedSound == i
             val color = if (!selected) Dark_Purple else Dandelion//off else on
             val textColor = if (!selected) Dandelion else Dark_Purple //off else on
@@ -445,7 +446,7 @@ class AlarmSettings : ComponentActivity() {
                             )
                         ),
                         color = textColor,
-                        fontSize = 12.sp,
+                        fontSize = 15.sp,
                         fontFamily = fontFamily,
                         fontWeight = FontWeight.Bold
                     )
@@ -467,10 +468,12 @@ class AlarmSettings : ComponentActivity() {
                 contentPadding = PaddingValues(0.dp),
                 modifier = Modifier
                     .height(40.dp)
-                    .width(70.dp))
+                    .width(100.dp)
+                    .padding(horizontal = 10.dp)
+            )
 
-                }
         }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
