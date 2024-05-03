@@ -10,7 +10,7 @@ class Alarm (
     // creates an array of 7 values which are default off
     var weekDays = BooleanArray(8)
     // creates default no activities
-    var activities = 0
+    var activities = 1
     // default chooses the first sound
     var sound = 1
     // default snooze 3 times and five minutes

@@ -290,11 +290,13 @@ class AlarmSettings : ComponentActivity() {
                             )
                             Box(
                                 modifier = Modifier
-                                    .width(195.dp)
+                                    .width(200.dp)
                                     .align(Alignment.CenterVertically), contentAlignment = Alignment.Center
                             )
                             {
-                                ActivityButtons()
+                                Row (){
+                                    ActivityButtons()
+                                }
                             }
                         }
                     }
@@ -364,6 +366,12 @@ class AlarmSettings : ComponentActivity() {
         }
     }
 
+@Preview
+@Composable
+fun SettingsPagePreview(){
+    SettingsPage(hour = "1", minute = "1", amOrPm = "AM", buttonID = 1)
+}
+
     private @Composable
     fun BackButton() {
         Button(
@@ -407,53 +415,50 @@ class AlarmSettings : ComponentActivity() {
     @Composable
     fun ActivityButtons() {
         var selectedActivity by remember { mutableStateOf(tempAlarm.activities) }
-        var selected = selectedActivity == i
-        val color = if (!selected) Dark_Purple else Dandelion//off else on
-        val textColor = if (!selected) Dandelion else Dark_Purple //off else on
-        Button(
-            content =
-            {
-                Text(
-                    text = "None",
-                    style = LocalTextStyle.current.merge(
-                        TextStyle(
-                            platformStyle = PlatformTextStyle(
-                                includeFontPadding = false
-                            ),
-                            lineHeightStyle = LineHeightStyle(
-                                alignment = LineHeightStyle.Alignment.Center,
-                                trim = LineHeightStyle.Trim.None
+        for (i in 1..2) {
+            var selected = selectedActivity == i
+            val color = if (!selected) Dark_Purple else Dandelion//off else on
+            val textColor = if (!selected) Dandelion else Dark_Purple //off else on
+            val activityText = if (i == 1) "None" else "Math"
+            Button(
+                content = {
+                    Text(
+                        text = activityText,
+                        style = LocalTextStyle.current.merge(
+                            TextStyle(
+                                platformStyle = PlatformTextStyle(
+                                    includeFontPadding = false
+                                ),
+                                lineHeightStyle = LineHeightStyle(
+                                    alignment = LineHeightStyle.Alignment.Center,
+                                    trim = LineHeightStyle.Trim.None
+                                )
                             )
-                        )
-                    ),
-                    color = textColor,
-                    fontSize = 15.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            onClick =
-            {
-                if (mediaPlayer.isPlaying){
-                    mediaPlayer.pause()
-                    mediaPlayer.seekTo(0)
-                }
-                mediaPlayer.start()
-                selectedActivity = i
-                tempAlarm.sound = selectedActivity
-            },
-            shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = color,
-            ),
-            contentPadding = PaddingValues(0.dp),
-            modifier = Modifier
-                .height(40.dp)
-                .width(100.dp)
-                .padding(horizontal = 10.dp)
-        )
+                        ),
+                        color = textColor,
+                        fontSize = 15.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                onClick =
+                {
+                    selectedActivity = i
+                    tempAlarm.sound = selectedActivity
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = color,
+                ),
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(100.dp)
+                    .padding(horizontal = 10.dp)
+            )
         }
     }
+}
 
     @Composable
     fun SoundButtons() {
@@ -506,11 +511,6 @@ class AlarmSettings : ComponentActivity() {
 
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-}
 
 @Preview
 @Composable
