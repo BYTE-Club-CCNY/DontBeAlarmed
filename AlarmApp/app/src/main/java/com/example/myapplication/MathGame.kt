@@ -85,7 +85,7 @@ class MathGame : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
+            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_4)
             LaunchedEffect(Unit) {
                 mediaPlayer.start()
             }
@@ -97,7 +97,7 @@ class MathGame : ComponentActivity() {
             ConstraintLayout{
                 var (questionBox, textBox, submitBox) = createRefs()
                 var phoneValue by remember { mutableStateOf("") }
-                var num by remember { mutableStateOf(List(2) { Random.nextInt(0, 10) }) }
+                var num by remember { mutableStateOf(List(2) { Random.nextInt(0, 11) }) }
                 var operation by remember { mutableStateOf((0..2).random()) }
                 val ans = GenerateEquationAns(num[0], num[1], operation)
                 Box(
@@ -214,7 +214,7 @@ fun GenerateEquationAns (num1: Int, num2: Int, operation:Int):Int {
         ans = if (operation == 0) {
             num1 + num2
         } else if (operation == 1) {
-            num1 -num2
+            num1 - num2
         } else {
             num1 * num2
         }
