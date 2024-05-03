@@ -68,7 +68,7 @@ class ButtonData : ComponentActivity() {
             var hour by remember { mutableStateOf("0") }
             var minute by remember { mutableStateOf("0") }
             var amOrPm by remember { mutableStateOf("0") }
-            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.special_alarm)
+            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
 
             LaunchedEffect(Unit) {
                 while (true) {
@@ -86,7 +86,7 @@ class ButtonData : ComponentActivity() {
                 }
             }
 
-            ButtonID(idNum = buttonIndex, hour = hour, minute = minute, amOrPm = amOrPm)
+            ButtonID(idNum = buttonIndex)
             LockOrientation()
             Background()
             SubHeader()
@@ -96,21 +96,12 @@ class ButtonData : ComponentActivity() {
     }
 
     @Composable
-    fun ButtonID(idNum: Int, hour: String, minute: String, amOrPm: String) {
+    fun ButtonID(idNum: Int) {
         if (idNum != -1) {
             when (idNum) {
-                1 -> {
-                        val intent = Intent(this, AlarmSettings::class.java)
-                        startActivity(intent)
-                }
-
-                2 -> {
-                        val intent = Intent(this, AlarmSettings::class.java)
-                        startActivity(intent)
-                }
-                3 -> {
-                        val intent = Intent(this, AlarmSettings::class.java)
-                        startActivity(intent)
+                idNum -> {
+                    val intent = Intent(this, AlarmSettings::class.java)
+                    startActivity(intent)
                 }
             }
         }

@@ -69,14 +69,11 @@ class MainActivity : ComponentActivity() {
             var hour by remember { mutableStateOf("0") }
             var minute by remember { mutableStateOf("0") }
             var amOrPm by remember { mutableStateOf("0") }
-            val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
-            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
             LockOrientation()
             Background()
             SubHeader()
             Header()
             ConstraintBoxes(hour = hour, minute = minute, amOrPm = amOrPm)
-
             LaunchedEffect(Unit) {
                 while (true) {
                     val cal = Calendar.getInstance()
@@ -92,11 +89,11 @@ class MainActivity : ComponentActivity() {
                     delay(1000)
                 }
             }
-            val hr = "03"
-            val min = "26"
-            val timeOfDay = "PM"
+
+            val hr = "01"
+            val min = "45"
+            val timeOfDay = "AM"
             if (hour == hr && minute == min && amOrPm == timeOfDay) {
-                mediaPlayer.start()
                 val intent = Intent(this, MathGame::class.java)
                 startActivity(intent)
             }
@@ -104,7 +101,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun ConstraintBoxes(
+    private fun ConstraintBoxes(
         hour: String,
         minute: String,
         amOrPm: String,
@@ -183,6 +180,7 @@ class MainActivity : ComponentActivity() {
 
         ) {}
     }
+
     @Composable
     fun ScrollButtons() {
         val state = rememberScrollState()
@@ -308,7 +306,7 @@ fun OnOffButton() {
 }
 
 @Composable
-fun DigitalClockComponent(
+fun DigitalClockComponent (
     hour: String,
     minute: String,
     amOrPm: String,
