@@ -265,7 +265,7 @@ class AlarmSettings : ComponentActivity() {
                                     .align(Alignment.CenterVertically), contentAlignment = Alignment.Center
                             )
                             {
-                                ActivityButton()
+                                ActivityButtons()
                             }
                         }
                     }
@@ -376,19 +376,16 @@ class AlarmSettings : ComponentActivity() {
 
     @Preview
     @Composable
-    fun ActivityButton() {
-    var activityText = ""
-    if(tempAlarm.activities == 0){
-        activityText = "New"
-    }
-    else
-    {
-        activityText = "${tempAlarm.activities}"
-    }
+    fun ActivityButtons() {
+        var selectedActivity by remember { mutableStateOf(tempAlarm.activities) }
+        var selected = selectedActivity == i
+        val color = if (!selected) Dark_Purple else Dandelion//off else on
+        val textColor = if (!selected) Dandelion else Dark_Purple //off else on
         Button(
-            content = {
+            content =
+            {
                 Text(
-                    text = activityText,
+                    text = "None",
                     style = LocalTextStyle.current.merge(
                         TextStyle(
                             platformStyle = PlatformTextStyle(
@@ -400,7 +397,7 @@ class AlarmSettings : ComponentActivity() {
                             )
                         )
                     ),
-                    color = Dark_Purple,
+                    color = textColor,
                     fontSize = 15.sp,
                     fontFamily = fontFamily,
                     fontWeight = FontWeight.Bold
@@ -408,19 +405,25 @@ class AlarmSettings : ComponentActivity() {
             },
             onClick =
             {
-                val nav = Intent(this, ActivityChoice::class.java)
-                startActivity(nav)
+                if (mediaPlayer.isPlaying){
+                    mediaPlayer.pause()
+                    mediaPlayer.seekTo(0)
+                }
+                mediaPlayer.start()
+                selectedActivity = i
+                tempAlarm.sound = selectedActivity
             },
             shape = RoundedCornerShape(20.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Dandelion,
-                contentColor = Dark_Purple,
+                containerColor = color,
             ),
             contentPadding = PaddingValues(0.dp),
             modifier = Modifier
                 .height(40.dp)
-                .width(80.dp)
+                .width(100.dp)
+                .padding(horizontal = 10.dp)
         )
+        }
     }
 
     @Composable
