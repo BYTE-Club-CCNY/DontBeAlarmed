@@ -30,6 +30,6 @@ fun readData(context: Context): Array<tempAlarm>? {
 fun getActiveDays(dayOfWeek: Map<String, Boolean>): String {
     val daysOrder = listOf("Mon", "Tus", "Wed", "Thu", "Fri", "Sat", "Sun")
     return daysOrder.map { day ->
-        if (dayOfWeek[day] == true) day.first() else ' '
+        if (dayOfWeek[day] == true) day.first() else ""
     }.joinToString(separator = "   ")
 }

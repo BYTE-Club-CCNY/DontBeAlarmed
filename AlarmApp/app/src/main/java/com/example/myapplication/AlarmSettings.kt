@@ -104,7 +104,7 @@ class AlarmSettings : ComponentActivity() {
         ConstraintLayout {
             //header notifying next alarm time
             Text(
-                text = "Title",
+                text = "Title $buttonID",
                 color =  Dark_Purple,
                 fontSize = 35.sp,
                 fontFamily = fontFamily,

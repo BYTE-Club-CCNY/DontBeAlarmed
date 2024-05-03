@@ -22,16 +22,7 @@
             android:exported="false"
             android:label="@string/title_activity_alarm_setting"
             android:theme="@style/Theme.MyApplication" />
-        <activity
-            android:name=".ButtonData"
-            android:exported="false"
-            android:label="@string/title_activity_button_data"
-            android:theme="@style/Theme.MyApplication" />
-        <activity
-            android:name=".ActivityChoice"
-            android:exported="false"
-            android:label="@string/title_activity_choice"
-            android:theme="@style/Theme.MyApplication" />
+
         <activity
             android:name=".AlarmSettings"
             android:exported="false"

@@ -198,7 +198,7 @@ class MainActivity : ComponentActivity() {
                     val activeDays = getActiveDays(alarm.dayOfWeek)
                     Button(
                         onClick = {
-                            val navigate = Intent(this@MainActivity, ButtonData::class.java)
+                            val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
                             navigate.putExtra("BUTTON_INDEX", index)
                             startActivity(navigate)
                         },
@@ -319,3 +319,25 @@ fun DigitalClockComponent (
         fontWeight = FontWeight.ExtraBold
     )
 }
+/*
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
+            ButtonID(idNum = buttonIndex)
+
+        }
+    }
+
+    @Composable
+    fun ButtonID(idNum: Int) {
+        if (idNum != -1) {
+            when (idNum) {
+                idNum -> {
+                    val intent = Intent(this, AlarmSettings::class.java)
+                    startActivity(intent)
+                }
+            }
+        }
+    }
+ */
