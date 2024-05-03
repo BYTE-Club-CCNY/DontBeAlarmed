@@ -25,6 +25,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -46,11 +47,12 @@ import com.example.myapplication.ui.theme.Alarm
 import com.example.myapplication.ui.theme.Dandelion
 import com.example.myapplication.ui.theme.Dark_Purple
 import com.example.myapplication.ui.theme.Sunset_Orange
+import kotlinx.coroutines.delay
+import java.util.Calendar
 
 
 var firstAlarm = Alarm(1, true, 1, 0)
 var tempAlarm = Alarm(0,true,0,0)
-internal lateinit var mediaPlayer: MediaPlayer
 
 class AlarmSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,34 +62,61 @@ class AlarmSettings : ComponentActivity() {
             Background()
             SubHeader()
             Header()
-            SettingsPage()        }
+
+            var hour by remember { mutableStateOf("0") }
+            var minute by remember { mutableStateOf("0") }
+            var amOrPm by remember { mutableStateOf("0") }
+
+            LaunchedEffect(Unit) {
+                while (true) {
+                    val cal = Calendar.getInstance()
+                    hour = cal.get(Calendar.HOUR).run {
+                        if (this.toString().length == 1) "0$this" else "$this"
+                    }
+                    minute = cal.get(Calendar.MINUTE).run {
+                        if (this.toString().length == 1) "0$this" else "$this"
+                    }
+                    amOrPm = cal.get(Calendar.AM_PM).run {
+                        if (this == Calendar.AM) "AM" else "PM"
+                    }
+                    delay(1000)
+                }
+            }
+
+            val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
+            SettingsPage(hour = hour, minute = minute, amOrPm = amOrPm, buttonID = buttonIndex)
+        }
         mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
     }
 
-    @Preview
     @Composable
-    fun SettingsPage() {
+    fun SettingsPage (
+        hour: String,
+        minute: String,
+        amOrPm: String,
+        buttonID: Int
+    ) {
         ConstraintLayout {
             //header notifying next alarm time
-            val (blankBox, titleBox, timeBox, optionBox, nextBox) = createRefs()
+            Text(
+                text = "Title $buttonID",
+                color =  Dark_Purple,
+                fontSize = 35.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.ExtraBold
+            )
+            val (blankBox, titleBox, timeBox, optionBox) = createRefs()
             //blankbox = Header
             Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(225.dp)
                     .constrainAs(blankBox) {}
                     .background(Color.Transparent)
-                    .padding(top = 60.dp)
-                    .padding(horizontal = 20.dp)
             ) {
                 Column() {
-                    Text(
-                        text = "Next Alarm in: ...",
-                        color = Dark_Purple,
-                        fontSize = 45.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Medium
-                    )
+                    DigitalClockComponent(hour = hour, minute = minute, amOrPm = amOrPm)
                 }
             }
             //section to input title for alarm
