@@ -51,14 +51,19 @@ import kotlinx.coroutines.delay
 import java.util.Calendar
 
 
-var firstAlarm = Alarm(1, true, 1, 0)
-var tempAlarm = Alarm(0,true,0,0)
+var firstAlarm = Alarm()
+var tempAlarm = Alarm()
 
 class AlarmSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            firstAlarm.alarmStatus = true
+            firstAlarm.hour = "01"
+            firstAlarm.minute = "00"
+            firstAlarm.meridiem = "PM"
             tempAlarm = firstAlarm
+
             Background()
             SubHeader()
             Header()
@@ -146,9 +151,9 @@ class AlarmSettings : ComponentActivity() {
                     }
                     .background(Color.Transparent)
             ) {
-                var selectedHour by remember { mutableStateOf(1) }
-                var selectedMinute by remember { mutableStateOf(0) }
-                var selectedPeriod by remember { mutableStateOf(1) }
+                var selectedHour by remember { mutableStateOf(tempAlarm.hour.toIntOrNull()!!) }
+                var selectedMinute by remember { mutableStateOf(tempAlarm.minute.toIntOrNull()!!) }
+                var selectedMeridiem by remember { mutableStateOf(meridiemConvertToInt(tempAlarm.meridiem)) }
                 ConstraintLayout {
                     val (hourBox, colonBox, minuteBox, timeOfDay, spacerBox) = createRefs()
                     Box(
@@ -161,10 +166,10 @@ class AlarmSettings : ComponentActivity() {
 
                     ) {
                         HourPicker(
-                            selectedHour = tempAlarm.hour,
+                            selectedHour = tempAlarm.hour.toIntOrNull()!!,
                             onHourSelected = { hour ->
                                 selectedHour = hour
-                                tempAlarm.hour = selectedHour
+                                tempAlarm.hour = selectedHour.toString()
                             }
                         )
                     }
@@ -190,10 +195,10 @@ class AlarmSettings : ComponentActivity() {
                             .constrainAs(minuteBox) {}
                     ) {
                         MinutePicker(
-                            selectedMinute = tempAlarm.minute,
+                            selectedMinute = tempAlarm.minute.toIntOrNull()!!,
                             onMinuteSelected = { minute ->
                                 selectedMinute = minute
-                                tempAlarm.minute = selectedMinute
+                                tempAlarm.minute = selectedMinute.toString()
                             }
                         )
                     }
@@ -213,11 +218,11 @@ class AlarmSettings : ComponentActivity() {
                             .height(100.dp)
                             .constrainAs(timeOfDay) {}
                     ) {
-                        DayPeriodPicker(
-                            selectedPeriod = tempAlarm.period,
+                        MeridiemPicker(
+                            selectedPeriod = meridiemConvertToInt(tempAlarm.meridiem),
                             onPeriodSelected = { period ->
-                                selectedPeriod = period
-                                tempAlarm.period = selectedPeriod
+                                selectedMeridiem = period
+                                tempAlarm.meridiem = meridiemConvertToString(selectedMeridiem)
                             }
                         )
                     }
@@ -414,7 +419,7 @@ fun SettingsPagePreview(){
     @Preview
     @Composable
     fun ActivityButtons() {
-        var selectedActivity by remember { mutableStateOf(tempAlarm.activities) }
+        var selectedActivity by remember { mutableStateOf(tempAlarm.gameType) }
         for (i in 1..2) {
             var selected = selectedActivity == i
             val color = if (!selected) Dark_Purple else Dandelion//off else on
@@ -444,7 +449,7 @@ fun SettingsPagePreview(){
                 onClick =
                 {
                     selectedActivity = i
-                    tempAlarm.sound = selectedActivity
+                    tempAlarm.gameType = selectedActivity
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -553,14 +558,14 @@ fun SaveButton() {
 @Preview
 @Composable
 fun WeekDayButtons() {
-    for(i in 1..7) {
-        var selected by remember { mutableStateOf(tempAlarm.weekDays[i]) }
+    for ((day, status) in tempAlarm.weekDays) {
+        var selected by remember { mutableStateOf(status) }
         val color = if (selected) Dandelion else Dark_Purple//colorchange
         val textColor = if (selected) Dark_Purple else Dandelion //colorchange
         Button(
             content = {
                 Text(
-                    text = WeekDayConvert(i),
+                    text = WeekDayToLetterConvert(day),
                     style = LocalTextStyle.current.merge(
                         TextStyle(
                             platformStyle = PlatformTextStyle(
@@ -581,7 +586,7 @@ fun WeekDayButtons() {
             onClick =
             {
                 selected = !selected
-                tempAlarm.weekDays[i] = selected
+                tempAlarm.weekDays[day] = selected
             },
             colors= ButtonDefaults.buttonColors(containerColor = color),
             shape = RoundedCornerShape(20.dp),
@@ -662,7 +667,7 @@ fun MinutePicker(selectedMinute: Int, onMinuteSelected: (Int) -> Unit) {
 }
 
 @Composable
-fun DayPeriodPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
+fun MeridiemPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         AndroidView(
             modifier = Modifier.fillMaxWidth(),
@@ -686,23 +691,45 @@ fun DayPeriodPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
 }
 
 
-fun WeekDayConvert (weekDay: Int): String {
-    var dayNumber = ""
-    if (weekDay == 1)
-        dayNumber = "S"
-    if (weekDay == 2)
-        dayNumber = "M"
-    if (weekDay == 3)
-        dayNumber = "T"
-    if (weekDay == 4)
-        dayNumber = "W"
-    if (weekDay == 5)
-        dayNumber = "T"
-    if (weekDay == 6)
-        dayNumber = "F"
-    if (weekDay == 7)
-        dayNumber = "S"
-    return dayNumber
+fun WeekDayToLetterConvert (weekDay: String): String {
+    var dayLetter = ""
+    if (weekDay == "Sun")
+        dayLetter = "S"
+    if (weekDay == "Mon")
+        dayLetter = "M"
+    if (weekDay == "Tue")
+        dayLetter = "T"
+    if (weekDay == "Wed")
+        dayLetter = "W"
+    if (weekDay == "Thu")
+        dayLetter = "T"
+    if (weekDay == "Fri")
+        dayLetter = "F"
+    if (weekDay == "Sat")
+        dayLetter = "S"
+    return dayLetter
 }
 
+fun meridiemConvertToInt(meridiem: String): Int {
+    if (meridiem == "AM"){
+        return 1
+    }
+    if (meridiem == "PM"){
+        return 2
+    }
+    else {
+        return -1
+    }
+}
 
+fun meridiemConvertToString(meridiem: Int): String {
+    if (meridiem == 1){
+        return "AM"
+    }
+    if (meridiem == 2){
+        return "PM"
+    }
+    else {
+        return ""
+    }
+}
