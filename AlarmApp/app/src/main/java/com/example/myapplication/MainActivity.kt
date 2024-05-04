@@ -44,6 +44,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -101,7 +102,7 @@ class MainActivity : ComponentActivity() {
         val timeCheckRequest: OneTimeWorkRequest =
             OneTimeWorkRequestBuilder<timeCheckWorker>()
                 .build()
-        workManager.enqueue(timeCheckRequest)
+        workManager.enqueueUniqueWork("Time Checking", ExistingWorkPolicy.KEEP, timeCheckRequest)
 
     }
 

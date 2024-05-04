@@ -12,8 +12,8 @@ import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.myapplication.database.readData
+import java.time.Duration
 import java.util.Calendar
-import java.util.concurrent.TimeUnit
 
 
 class timeCheckWorker (appContext: Context, workerParams: WorkerParameters):
@@ -22,7 +22,7 @@ class timeCheckWorker (appContext: Context, workerParams: WorkerParameters):
         Log.d(TAG, "Checking Time")
         TimeCheck()
         val timeCheckRequest: OneTimeWorkRequest = OneTimeWorkRequestBuilder<timeCheckWorker>()
-            .setInitialDelay(1, TimeUnit.MINUTES)
+            .setInitialDelay(Duration.ofMinutes(1))
             .build()
         WorkManager.getInstance(this.applicationContext).enqueue(timeCheckRequest)
         return Result.success()
@@ -52,6 +52,7 @@ class timeCheckWorker (appContext: Context, workerParams: WorkerParameters):
                 else -> ""
             }
         }
+        Log.d(TAG, "$currentHour:$currentMinute $currentAmOrPm $currentDay")
         val alarms = readData(applicationContext)
         alarms?.forEachIndexed { index, alarm ->
             val hr = alarm.hour
