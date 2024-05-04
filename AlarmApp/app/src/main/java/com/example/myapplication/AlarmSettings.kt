@@ -43,7 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
-import com.example.myapplication.ui.theme.Alarm
+import com.example.myapplication.database.tempAlarm
 import com.example.myapplication.ui.theme.Dandelion
 import com.example.myapplication.ui.theme.Dark_Purple
 import com.example.myapplication.ui.theme.Sunset_Orange
@@ -51,9 +51,27 @@ import kotlinx.coroutines.delay
 import java.util.Calendar
 
 
-var firstAlarm = Alarm()
-var tempAlarm = Alarm()
+var firstAlarm = tempAlarm("", "00", "00", "AM", true, 1, 1,
+    mutableMapOf(
+        "Sun" to false,
+        "Mon" to false,
+        "Tue" to false,
+        "Wed" to false,
+        "Thu" to false,
+        "Fri" to false,
+        "Sat" to false
+    ))
 
+var copyAlarm = tempAlarm("", "00", "00", "AM", true, 1, 1,
+    mutableMapOf(
+        "Sun" to false,
+        "Mon" to false,
+        "Tue" to false,
+        "Wed" to false,
+        "Thu" to false,
+        "Fri" to false,
+        "Sat" to false
+    ))
 class AlarmSettings : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +80,7 @@ class AlarmSettings : ComponentActivity() {
             firstAlarm.hour = "01"
             firstAlarm.minute = "00"
             firstAlarm.meridiem = "PM"
-            tempAlarm = firstAlarm
+            copyAlarm = firstAlarm
 
             Background()
             SubHeader()
@@ -151,9 +169,9 @@ class AlarmSettings : ComponentActivity() {
                     }
                     .background(Color.Transparent)
             ) {
-                var selectedHour by remember { mutableStateOf(tempAlarm.hour.toIntOrNull()!!) }
-                var selectedMinute by remember { mutableStateOf(tempAlarm.minute.toIntOrNull()!!) }
-                var selectedMeridiem by remember { mutableStateOf(meridiemConvertToInt(tempAlarm.meridiem)) }
+                var selectedHour by remember { mutableStateOf(copyAlarm.hour.toIntOrNull()!!) }
+                var selectedMinute by remember { mutableStateOf(copyAlarm.minute.toIntOrNull()!!) }
+                var selectedMeridiem by remember { mutableStateOf(meridiemConvertToInt(copyAlarm.meridiem)) }
                 ConstraintLayout {
                     val (hourBox, colonBox, minuteBox, timeOfDay, spacerBox) = createRefs()
                     Box(
@@ -166,10 +184,10 @@ class AlarmSettings : ComponentActivity() {
 
                     ) {
                         HourPicker(
-                            selectedHour = tempAlarm.hour.toIntOrNull()!!,
+                            selectedHour = copyAlarm.hour.toIntOrNull()!!,
                             onHourSelected = { hour ->
                                 selectedHour = hour
-                                tempAlarm.hour = selectedHour.toString()
+                                copyAlarm.hour = selectedHour.toString()
                             }
                         )
                     }
@@ -195,10 +213,10 @@ class AlarmSettings : ComponentActivity() {
                             .constrainAs(minuteBox) {}
                     ) {
                         MinutePicker(
-                            selectedMinute = tempAlarm.minute.toIntOrNull()!!,
+                            selectedMinute = copyAlarm.minute.toIntOrNull()!!,
                             onMinuteSelected = { minute ->
                                 selectedMinute = minute
-                                tempAlarm.minute = selectedMinute.toString()
+                                copyAlarm.minute = selectedMinute.toString()
                             }
                         )
                     }
@@ -219,10 +237,10 @@ class AlarmSettings : ComponentActivity() {
                             .constrainAs(timeOfDay) {}
                     ) {
                         MeridiemPicker(
-                            selectedPeriod = meridiemConvertToInt(tempAlarm.meridiem),
+                            selectedPeriod = meridiemConvertToInt(copyAlarm.meridiem),
                             onPeriodSelected = { period ->
                                 selectedMeridiem = period
-                                tempAlarm.meridiem = meridiemConvertToString(selectedMeridiem)
+                                copyAlarm.meridiem = meridiemConvertToString(selectedMeridiem)
                             }
                         )
                     }
@@ -419,7 +437,7 @@ fun SettingsPagePreview(){
     @Preview
     @Composable
     fun ActivityButtons() {
-        var selectedActivity by remember { mutableStateOf(tempAlarm.gameType) }
+        var selectedActivity by remember { mutableStateOf(copyAlarm.gameType) }
         for (i in 1..2) {
             var selected = selectedActivity == i
             val color = if (!selected) Dark_Purple else Dandelion//off else on
@@ -449,7 +467,7 @@ fun SettingsPagePreview(){
                 onClick =
                 {
                     selectedActivity = i
-                    tempAlarm.gameType = selectedActivity
+                    copyAlarm.gameType = selectedActivity
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -467,7 +485,7 @@ fun SettingsPagePreview(){
 
     @Composable
     fun SoundButtons() {
-        var selectedSound by remember { mutableStateOf(tempAlarm.sound) }
+        var selectedSound by remember { mutableStateOf(copyAlarm.sound) }
         for (i in 1..2) {
             var selected = selectedSound == i
             val color = if (!selected) Dark_Purple else Dandelion//off else on
@@ -501,7 +519,7 @@ fun SettingsPagePreview(){
                     }
                     mediaPlayer.start()
                     selectedSound = i
-                    tempAlarm.sound = selectedSound
+                    copyAlarm.sound = selectedSound
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -543,7 +561,7 @@ fun SaveButton() {
         },
         onClick =
         {
-            firstAlarm = tempAlarm
+            firstAlarm = copyAlarm
         },
         shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
@@ -558,7 +576,7 @@ fun SaveButton() {
 @Preview
 @Composable
 fun WeekDayButtons() {
-    for ((day, status) in tempAlarm.weekDays) {
+    for ((day, status) in copyAlarm.dayOfWeek) {
         var selected by remember { mutableStateOf(status) }
         val color = if (selected) Dandelion else Dark_Purple//colorchange
         val textColor = if (selected) Dark_Purple else Dandelion //colorchange
@@ -586,7 +604,7 @@ fun WeekDayButtons() {
             onClick =
             {
                 selected = !selected
-                tempAlarm.weekDays[day] = selected
+                copyAlarm.dayOfWeek[day] = selected
             },
             colors= ButtonDefaults.buttonColors(containerColor = color),
             shape = RoundedCornerShape(20.dp),
@@ -602,14 +620,14 @@ fun WeekDayButtons() {
 fun AlarmTitleInputBox() {
     // auto shows original first alarm name in the text field
     var text by remember {
-        mutableStateOf("${tempAlarm.title}")
+        mutableStateOf("${copyAlarm.title}")
     }
         TextField(
             shape = RoundedCornerShape(15.dp),
             value = text,
             onValueChange = {
                 text = it
-                tempAlarm.title = text },
+                copyAlarm.title = text },
             placeholder = { Text("Add Title") },
             maxLines = 1,
             textStyle = TextStyle(

@@ -231,7 +231,7 @@ class MainActivity : ComponentActivity() {
                                     }
                             ){
                                 Text(
-                                    text = "${alarm.hour}:${alarm.minutes} ${alarm.meridiem}",
+                                    text = "${alarm.hour}:${alarm.minute} ${alarm.meridiem}",
                                     style = LocalTextStyle.current.merge(
                                         TextStyle(
                                             platformStyle = PlatformTextStyle(

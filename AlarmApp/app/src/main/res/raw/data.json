@@ -2,9 +2,9 @@
   {
     "title": "Alarm 1",
     "hour": "00",
-    "minutes": "08",
+    "minute": "08",
     "meridiem": "AM",
-    "On": true,
+    "alarmStatus": true,
     "sound": 0,
     "gameType": 1,
     "dayOfWeek": {
@@ -20,9 +20,9 @@
   {
     "name": "Alarm 2",
     "hour": "12",
-    "minutes": "30",
+    "minute": "30",
     "meridiem": "AM",
-    "On": true,
+    "alarmStatus": true,
     "sound": 0,
     "gameType": 1,
     "dayOfWeek": {
@@ -38,9 +38,9 @@
   {
     "name": "Alarm 3",
     "hour": "10",
-    "minutes": "30",
+    "minute": "30",
     "meridiem": "PM",
-    "On": true,
+    "alarmStatus": true,
     "sound": 0,
     "gameType": 1,
     "dayOfWeek": {

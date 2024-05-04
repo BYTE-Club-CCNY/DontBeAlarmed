@@ -56,7 +56,7 @@ class timeCheckWorker (appContext: Context, workerParams: WorkerParameters):
         val alarms = readData(applicationContext)
         alarms?.forEachIndexed { index, alarm ->
             val hr = alarm.hour
-            val min = alarm.minutes
+            val min = alarm.minute
             val timeOfDay = alarm.meridiem
             if (currentHour == hr && currentMinute == min && currentAmOrPm == timeOfDay && alarm.dayOfWeek[currentDay] == true) {
                 val intent = Intent(applicationContext, MathGame::class.java)
