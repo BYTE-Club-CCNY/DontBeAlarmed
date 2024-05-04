@@ -1,7 +1,10 @@
 package com.example.myapplication
 
+import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -24,42 +27,33 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.myapplication.ui.theme.Dark_Purple
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import android.content.Context
-import android.media.MediaPlayer
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.material3.TextField
-import androidx.compose.ui.Alignment
-import com.example.myapplication.ui.theme.Dandelion
-import com.example.myapplication.ui.theme.Soft_Purple
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import kotlinx.coroutines.delay
-import java.time.LocalDate
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.util.Calendar
-import com.example.myapplication.database.readData
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
 import com.example.myapplication.database.getActiveDays
-
+import com.example.myapplication.database.readData
+import com.example.myapplication.ui.theme.Dark_Purple
+import kotlinx.coroutines.delay
+import java.util.Calendar
 
 
 class MainActivity : ComponentActivity() {
@@ -68,12 +62,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             var hour by remember { mutableStateOf("0") }
             var minute by remember { mutableStateOf("0") }
+            var second by remember { mutableStateOf("-1") }
             var amOrPm by remember { mutableStateOf("0") }
             LockOrientation()
             Background()
             SubHeader()
             Header()
-            ConstraintBoxes(hour = hour, minute = minute, amOrPm = amOrPm)
+            ConstraintBoxes(hour = hour, minute = minute, second = second, amOrPm = amOrPm)
             LaunchedEffect(Unit) {
                 while (true) {
                     val cal = Calendar.getInstance()
@@ -83,6 +78,7 @@ class MainActivity : ComponentActivity() {
                     minute = cal.get(Calendar.MINUTE).run {
                         if (this.toString().length == 1) "0$this" else "$this"
                     }
+                    second = cal.get(Calendar.SECOND).toString()
                     amOrPm = cal.get(Calendar.AM_PM).run {
                         if (this == Calendar.AM) "AM" else "PM"
                     }
@@ -90,20 +86,30 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            val hr = "01"
-            val min = "45"
-            val timeOfDay = "AM"
-            if (hour == hr && minute == min && amOrPm == timeOfDay) {
-                val intent = Intent(this, MathGame::class.java)
-                startActivity(intent)
-            }
+//            val hr = "09"
+//            val min = "54"
+//            val timeOfDay = "PM"
+//            if (hour == hr && minute == min && amOrPm == timeOfDay && second == "0") {
+//                val intent = Intent(this, MathGame::class.java)
+//                startActivity(intent)
+//            }
         }
+
+        Log.d(TAG, "Starting Periodic Work")
+        val workManager = WorkManager.getInstance(application)
+        workManager.enqueue(OneTimeWorkRequestBuilder<HelloWorker>().build())
+        val timeCheckRequest: OneTimeWorkRequest =
+            OneTimeWorkRequestBuilder<timeCheckWorker>()
+                .build()
+        workManager.enqueue(timeCheckRequest)
+
     }
 
     @Composable
     private fun ConstraintBoxes(
         hour: String,
         minute: String,
+        second: String,
         amOrPm: String,
     ) {
         ConstraintLayout {
@@ -341,3 +347,15 @@ fun DigitalClockComponent (
         }
     }
  */
+
+
+class HelloWorker(appContext: Context, workerParams: WorkerParameters):
+    Worker(appContext, workerParams) {
+    override fun doWork(): Result {
+
+        Log.d(TAG, "hello world")
+
+        // Indicate whether the work finished successfully with the Result
+        return Result.success()
+    }
+}

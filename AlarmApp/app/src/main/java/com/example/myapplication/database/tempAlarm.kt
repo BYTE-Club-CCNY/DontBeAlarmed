@@ -2,8 +2,8 @@ package com.example.myapplication.database
 
 data class tempAlarm(
     val title: String,
-    val hour: Int,
-    val minutes: Int,
+    val hour: String,
+    val minutes: String,
     val meridiem: String,
     val On: Boolean,
     val sound: Int,

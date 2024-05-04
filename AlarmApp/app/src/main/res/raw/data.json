@@ -1,8 +1,8 @@
 [
   {
     "title": "Alarm 1",
-    "hour": 8,
-    "minutes": 30,
+    "hour": "11",
+    "minutes": "16",
     "meridiem": "PM",
     "On": true,
     "sound": 0,
@@ -19,8 +19,8 @@
   },
   {
     "name": "Alarm 2",
-    "hour": 12,
-    "minutes": 30,
+    "hour": "12",
+    "minutes": "30",
     "meridiem": "AM",
     "On": true,
     "sound": 0,
@@ -37,8 +37,8 @@
   },
   {
     "name": "Alarm 3",
-    "hour": 10,
-    "minutes": 30,
+    "hour": "10",
+    "minutes": "30",
     "meridiem": "PM",
     "On": true,
     "sound": 0,
