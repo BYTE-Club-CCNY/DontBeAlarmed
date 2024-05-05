@@ -1,9 +1,9 @@
 [
   {
     "title": "Alarm 1",
-    "hour": "00",
-    "minute": "08",
-    "meridiem": "AM",
+    "hour": "01",
+    "minute": "02",
+    "meridiem": "PM",
     "alarmStatus": true,
     "sound": 0,
     "gameType": 1,
@@ -14,7 +14,7 @@
       "Thu": true,
       "Fri": true,
       "Sat": true,
-      "Sun": false
+      "Sun": true
     }
   },
   {
@@ -51,6 +51,24 @@
       "Fri": true,
       "Sat": true,
       "Sun": false
+    }
+  },
+  {
+    "title": "Alarm 1",
+    "hour": "01",
+    "minute": "06",
+    "meridiem": "PM",
+    "alarmStatus": true,
+    "sound": 0,
+    "gameType": 1,
+    "dayOfWeek": {
+      "Mon": false,
+      "Tus": false,
+      "Wed": true,
+      "Thu": true,
+      "Fri": true,
+      "Sat": true,
+      "Sun": true
     }
   }
 ]
