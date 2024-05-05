@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.example.myapplication.database.readData
 import com.example.myapplication.database.tempAlarm
 import com.example.myapplication.ui.theme.Dandelion
 import com.example.myapplication.ui.theme.Dark_Purple
@@ -73,6 +74,7 @@ var copyAlarm = tempAlarm("", "00", "00", "AM", true, 1, 1,
         "Sat" to false
     ))
 class AlarmSettings : ComponentActivity() {
+    val alarms = { readData(this) }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

@@ -1,6 +1,6 @@
 package com.example.myapplication.ui.theme
 
-class Alarm (){
+class OldAlarm (){
     // sets properties of the alarm including if its on or off, title, hour, minute
     var title = ""
     var hour = "00"
