@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -42,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.navigation.NavController
+import com.example.myapplication.database.createAlarmInJson
 import com.example.myapplication.ui.theme.Alarm
 import com.example.myapplication.ui.theme.Dandelion
 import com.example.myapplication.ui.theme.Dark_Purple
@@ -53,6 +57,7 @@ var tempAlarm = Alarm(0,true,0,0)
 internal lateinit var mediaPlayer: MediaPlayer
 
 class AlarmSettings : ComponentActivity() {
+    private val navController = NavController(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -60,13 +65,12 @@ class AlarmSettings : ComponentActivity() {
             Background()
             SubHeader()
             Header()
-            SettingsPage()        }
+            SettingsPage(this@AlarmSettings, navController)        }
         mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
     }
 
-    @Preview
     @Composable
-    fun SettingsPage() {
+    fun SettingsPage(context: Context, navController: NavController) {
         ConstraintLayout {
             //header notifying next alarm time
             val (blankBox, titleBox, timeBox, optionBox, nextBox) = createRefs()
@@ -205,7 +209,7 @@ class AlarmSettings : ComponentActivity() {
                     }
             ) {
                 ConstraintLayout {
-                    val (weekBox, activityBox, soundBox,  nextBox) = createRefs()
+                    val (weekBox, activityBox, soundBox, nextBox) = createRefs()
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -327,7 +331,7 @@ class AlarmSettings : ComponentActivity() {
                             BackButton()
                             Spacer(modifier = Modifier
                                 .width(125.dp))
-                            SaveButton()
+                            SaveButton(context, navController)
                         }
                     }
                 }
@@ -479,49 +483,49 @@ class AlarmSettings : ComponentActivity() {
         super.onDestroy()
     }
 }
-
-@Preview
 @Composable
-fun SaveButton() {
+fun SaveButton(context: Context, navController: NavController) {
     Button(
-        content = {
-            Text(
-                text = "Save",
-                style = LocalTextStyle.current.merge(
-                    TextStyle(
-                        platformStyle = PlatformTextStyle(
-                            includeFontPadding = false
-                        ),
-                        lineHeightStyle = LineHeightStyle(
-                            alignment = LineHeightStyle.Alignment.Center,
-                            trim = LineHeightStyle.Trim.None
-                        )
-                    )
-                ),
-                color = Dark_Purple,
-                fontSize = 15.sp,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.Light
-            )
-        },
-        onClick =
-        {
-            firstAlarm = tempAlarm
-        },
+        onClick = { saveAlarm(context)
+            navController.navigate("main")},
         shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Dandelion,
+            containerColor = Sunset_Orange,
             contentColor = Dark_Purple,
         ),
         contentPadding = PaddingValues(0.dp),
         modifier = Modifier
             .height(40.dp)
-            .width(80.dp))
+            .width(80.dp)
+    ) {
+        Text(
+            text = "Save",
+            style = LocalTextStyle.current.merge(
+                TextStyle(
+                    platformStyle = PlatformTextStyle(
+                        includeFontPadding = false
+                    ),
+                    lineHeightStyle = LineHeightStyle(
+                        alignment = LineHeightStyle.Alignment.Center,
+                        trim = LineHeightStyle.Trim.None
+                    ),
+                    fontSize = 15.sp,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight.Light,
+                    color = Dark_Purple
+                )
+            ),
+            modifier = Modifier.padding(horizontal = 10.dp)
+        )
+    }
 }
+
+
 @Preview
 @Composable
 fun WeekDayButtons() {
     for(i in 1..7) {
+
         var selected by remember { mutableStateOf(tempAlarm.weekDays[i]) }
         val color = if (selected) Dandelion else Dark_Purple//colorchange
         val textColor = if (selected) Dark_Purple else Dandelion //colorchange
@@ -565,7 +569,7 @@ fun WeekDayButtons() {
 fun AlarmTitleInputBox() {
     // auto shows original first alarm name in the text field
     var text by remember {
-        mutableStateOf("${tempAlarm.title}")
+        mutableStateOf(tempAlarm.title)
     }
         TextField(
             shape = RoundedCornerShape(15.dp),
@@ -606,6 +610,7 @@ fun HourPicker(selectedHour: Int, onHourSelected: (Int) -> Unit) {
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun MinutePicker(selectedMinute: Int, onMinuteSelected: (Int) -> Unit) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -636,8 +641,8 @@ fun DayPeriodPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
             modifier = Modifier.fillMaxWidth(),
             factory = { context ->
                 NumberPicker(context).apply {
-                    minValue = 1 // am value
-                    maxValue = 2 // pm value
+                    minValue = 0 // am value
+                    maxValue = 1 // pm value
                     value = selectedPeriod // Initial selected period
                     textSize = 70f
                     textColor = 4281802289.toInt()
@@ -650,7 +655,6 @@ fun DayPeriodPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
             }
         )
     }
-
 }
 
 
@@ -672,5 +676,28 @@ fun WeekDayConvert (weekDay: Int): String {
         dayNumber = "S"
     return dayNumber
 }
+
+
+fun saveAlarm(context: Context) {
+    createAlarmInJson(
+        context = context,
+        title = tempAlarm.title,
+        hour = tempAlarm.hour,
+        minutes = tempAlarm.minute,
+        meridiem = if (tempAlarm.period == 0) "AM" else "PM",
+        on = true,
+        sound = tempAlarm.sound,
+        gameType = tempAlarm.activities,
+        dayOfWeek = booleanArrayToMap(tempAlarm.weekDays)
+    )
+}
+
+fun booleanArrayToMap(booleanArray: BooleanArray): Map<String, Boolean> {
+    val daysOfWeek = arrayOf("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+    return daysOfWeek.zip(booleanArray.toList()).toMap()
+}
+
+
+
 
 
