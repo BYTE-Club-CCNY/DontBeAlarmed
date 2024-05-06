@@ -68,7 +68,7 @@ class MainActivity : ComponentActivity() {
                 while (true) {
                     val cal = Calendar.getInstance()
                     hour = cal.get(Calendar.HOUR).run {
-                        if (this.toString().length == 1) "0$this" else "$this"
+                        if (this == 1) "12" else if (this.toString().length == 1) "0$this" else "$this"
                     }
                     minute = cal.get(Calendar.MINUTE).run {
                         if (this.toString().length == 1) "0$this" else "$this"
@@ -282,7 +282,7 @@ class MainActivity : ComponentActivity() {
     fun TimeCheck() {
         val cal = Calendar.getInstance()
         val currentHour = cal.get(Calendar.HOUR).run {
-            if (this.toString().length == 1) "0$this" else "$this"
+            if (this == 1) "12" else if (this.toString().length == 1) "0$this" else "$this"
         }
         val currentMinute = cal.get(Calendar.MINUTE).run {
             if (this.toString().length == 1) "0$this" else "$this"

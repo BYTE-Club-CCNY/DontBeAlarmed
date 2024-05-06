@@ -4,14 +4,12 @@ import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Log
 import android.widget.NumberPicker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -90,7 +87,7 @@ class AlarmSettings : ComponentActivity() {
                 while (true) {
                     val cal = Calendar.getInstance()
                     hour = cal.get(Calendar.HOUR).run {
-                        if (this.toString().length == 1) "0$this" else "$this"
+                        if (this == 1) "12" else if (this.toString().length == 1) "0$this" else "$this"
                     }
                     minute = cal.get(Calendar.MINUTE).run {
                         if (this.toString().length == 1) "0$this" else "$this"
