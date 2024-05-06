@@ -43,8 +43,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.work.Worker
-import androidx.work.WorkerParameters
 import com.example.myapplication.database.clearJson
 import com.example.myapplication.database.getActiveDays
 import com.example.myapplication.database.logAlarm
@@ -69,27 +67,18 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 while (true) {
                     val cal = Calendar.getInstance()
-                    hour = cal.get(Calendar.HOUR).run {
-                        if (this.toString().length == 1) "0$this" else "$this"
-                    }
-                    minute = cal.get(Calendar.MINUTE).run {
-                        if (this.toString().length == 1) "0$this" else "$this"
-                    }
-                    amOrPm = cal.get(Calendar.AM_PM).run {
-                        if (this == Calendar.AM) "AM" else "PM"
-                    }
+                    hour = String.format(
+                        "%02d",
+                        cal.get(Calendar.HOUR_OF_DAY)
+                    ) // Use 24-hour format and ensure leading zeros
+                    minute = String.format("%02d", cal.get(Calendar.MINUTE))
+                    amOrPm = if (cal.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
+
                     TimeCheck()
-                    delay(1000)
+
+                    delay(1000) // Check every 1 second
                 }
             }
-
-//            val hr = "09"
-//            val min = "54"
-//            val timeOfDay = "PM"
-//            if (hour == hr && minute == min && amOrPm == timeOfDay && second == "0") {
-//                val intent = Intent(this, MathGame::class.java)
-//                startActivity(intent)
-//            }
         }
     }
 
@@ -123,7 +112,7 @@ class MainActivity : ComponentActivity() {
                         )
                     ),
                     text = "+",
-                    color =  Dark_Purple,
+                    color = Dark_Purple,
                     fontSize = 35.sp,
                     fontFamily = fontFamily,
                     fontWeight = FontWeight.ExtraBold,
@@ -157,7 +146,7 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun NewAlarm(){
+    fun NewAlarm() {
         Button(
             onClick = {
                 val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
@@ -216,9 +205,13 @@ class MainActivity : ComponentActivity() {
                                     .constrainAs(textBox) {
                                         bottom.linkTo(daysBox.top)
                                     }
-                            ){
+                            ) {
                                 Text(
-                                    text = "${if (alarm.hour == "00") "12" else alarm.hour}:${doubledigit(alarm.minute)} ${alarm.meridiem}",
+                                    text = "${if (alarm.hour == "00") "12" else alarm.hour}:${
+                                        doubledigit(
+                                            alarm.minute
+                                        )
+                                    } ${alarm.meridiem}",
                                     style = LocalTextStyle.current.merge(
                                         TextStyle(
                                             platformStyle = PlatformTextStyle(
@@ -261,60 +254,52 @@ class MainActivity : ComponentActivity() {
                                     color = Dark_Purple,
                                     fontSize = 15.sp,
                                     fontFamily = fontFamily,
-                                    fontWeight = FontWeight.Bold)
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                             Box(
                                 modifier = Modifier
                                     .padding(15.dp)
                                     .constrainAs(switchButton) {}
                             ) {
-                                OnOffButton(context = this@MainActivity, buttonID = index, checked = alarm.alarmStatus)
+                                OnOffButton(
+                                    context = this@MainActivity,
+                                    buttonID = index,
+                                    checked = alarm.alarmStatus
+                                )
                             }
-                            createHorizontalChain(textBox,switchButton)
+                            createHorizontalChain(textBox, switchButton)
                         }
                     }
                 }
             }
         }
     }
+
     fun TimeCheck() {
-// checks each alarm in json file and compares it to current time
         val cal = Calendar.getInstance()
-        var currentHour = cal.get(Calendar.HOUR).run {
-            if (this.toString().length == 1) "0$this" else "$this"
-        }
-        var currentMinute = cal.get(Calendar.MINUTE).run {
-            if (this.toString().length == 1) "0$this" else "$this"
+        val currentHour = String.format("%02d", cal.get(Calendar.HOUR_OF_DAY))
+        val currentMinute = String.format("%02d", cal.get(Calendar.MINUTE))
+        val currentSecond = cal.get(Calendar.SECOND).toString()
+
+        val currentAmOrPm = if (cal.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
+        val currentDay = cal.get(Calendar.DAY_OF_WEEK).run {
+            listOf("", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")[this]
         }
 
-        var currentSecond = cal.get(Calendar.SECOND).toString()
-
-        var currentAmOrPm = cal.get(Calendar.AM_PM).run {
-            if (this == Calendar.AM) "AM" else "PM"
-        }
-        var currentDay = cal.get(Calendar.DAY_OF_WEEK).run {
-            when(this) {
-                1 -> "Sun"
-                2 -> "Mon"
-                3 -> "Tue"
-                4 -> "Wed"
-                5 -> "Thu"
-                6 -> "Fri"
-                7 -> "Sat"
-                else -> ""
-            }
-        }
         val alarms = readData(applicationContext)
+        Log.d("TimeCheck", "Checking alarms: Current Time - $currentHour:$currentMinute $currentAmOrPm, Current Second - $currentSecond, Current Day - $currentDay")
         alarms?.forEachIndexed { index, alarm ->
-            val hr = alarm.hour
-            val min = alarm.minute
-            val timeOfDay = alarm.meridiem
-            if (currentHour == hr && currentMinute == min && currentAmOrPm == timeOfDay && currentSecond.toInt() == 0 && alarm.dayOfWeek[currentDay] == true && alarm.alarmStatus) {
-                val intent = Intent(applicationContext, MathGame::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val alarmHour = doubledigit(alarm.hour)
+            val alarmMinute = doubledigit(alarm.minute)
+            Log.d("TimeCheck", "Alarm #$index - Time: ${alarmHour}:${alarmMinute} ${alarm.meridiem}, Day: ${alarm.dayOfWeek}, Status: ${alarm.alarmStatus}")
+            if (currentHour == alarmHour && currentMinute == alarmMinute && currentAmOrPm == alarm.meridiem && alarm.dayOfWeek[currentDay] == true && alarm.alarmStatus == true && currentSecond == "0") {
+                Log.d("TimeCheck", "Alarm #$index triggered.")
+                val intent = Intent(applicationContext, MathGame::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
                 startActivity(intent)
             }
-
         }
     }
 }
