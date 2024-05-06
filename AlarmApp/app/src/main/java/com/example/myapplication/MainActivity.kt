@@ -45,7 +45,9 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.example.myapplication.database.clearJson
 import com.example.myapplication.database.getActiveDays
+import com.example.myapplication.database.logAlarm
 import com.example.myapplication.database.readData
 import com.example.myapplication.ui.theme.Dark_Purple
 import kotlinx.coroutines.delay
@@ -266,7 +268,7 @@ class MainActivity : ComponentActivity() {
                                     .padding(15.dp)
                                     .constrainAs(switchButton) {}
                             ) {
-                                OnOffButton()
+                                OnOffButton(context = this@MainActivity, buttonID = index, checked = alarm.alarmStatus)
                             }
                             createHorizontalChain(textBox,switchButton)
                         }
@@ -307,7 +309,7 @@ class MainActivity : ComponentActivity() {
             val hr = alarm.hour
             val min = alarm.minute
             val timeOfDay = alarm.meridiem
-            if (currentHour == hr && currentMinute == min && currentAmOrPm == timeOfDay && currentSecond.toInt() == 0 && alarm.dayOfWeek[currentDay] == true) {
+            if (currentHour == hr && currentMinute == min && currentAmOrPm == timeOfDay && currentSecond.toInt() == 0 && alarm.dayOfWeek[currentDay] == true && alarm.alarmStatus) {
                 val intent = Intent(applicationContext, MathGame::class.java)
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 startActivity(intent)
@@ -318,12 +320,23 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun OnOffButton() {
-    var checked by remember { mutableStateOf(true) }
+fun OnOffButton(context: Context, buttonID: Int, checked: Boolean) {
+    val alarms = remember { readData(context) }
+    var check by remember { mutableStateOf(checked) }
     Switch(
-        checked = checked,
+        checked = check,
         onCheckedChange = {
-            checked = it
+            check = it
+            clearJson(context)
+            alarms?.forEachIndexed { index, alarm ->
+                if (buttonID == index) {
+                    alarm.alarmStatus = check
+                    logAlarm(context, alarm)
+                    return@forEachIndexed
+                } else {
+                    logAlarm(context, alarm)
+                }
+            }
         },
         Modifier.scale(2f),
         colors = SwitchDefaults.colors(
@@ -333,9 +346,9 @@ fun OnOffButton() {
             uncheckedThumbColor = Color(4281802289),
             uncheckedTrackColor = Color(4284563290)
         )
-
     )
 }
+
 
 @Composable
 fun DigitalClockComponent (
