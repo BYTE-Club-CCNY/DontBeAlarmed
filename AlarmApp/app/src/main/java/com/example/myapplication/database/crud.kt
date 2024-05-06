@@ -12,10 +12,6 @@ import java.io.FileInputStream
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStreamReader
-import kotlin.collections.MutableList
-
-
-
 
 
 fun readData(context: Context): MutableList<tempAlarm>? {
@@ -97,7 +93,7 @@ fun clearJson(context: Context) {
     }
 }
 fun getActiveDays(dayOfWeek: Map<String, Boolean>): String {
-    val daysOrder = listOf("Mon", "Tus", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val daysOrder = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
     return daysOrder.map { day ->
         if (dayOfWeek[day] == true) day.first() else ""
     }.joinToString(separator = "   ")
