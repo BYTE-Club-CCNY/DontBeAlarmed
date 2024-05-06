@@ -1,7 +1,10 @@
 package com.example.myapplication
 
+import android.content.ContentValues.TAG
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -24,30 +27,34 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.myapplication.ui.theme.Dark_Purple
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import android.media.MediaPlayer
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.Worker
+import androidx.work.WorkerParameters
+import com.example.myapplication.database.getActiveDays
+import com.example.myapplication.database.readData
+import com.example.myapplication.ui.theme.Dark_Purple
 import kotlinx.coroutines.delay
 import java.util.Calendar
-import com.example.myapplication.database.readData
-import com.example.myapplication.database.getActiveDays
-
 
 
 class MainActivity : ComponentActivity() {
@@ -56,15 +63,13 @@ class MainActivity : ComponentActivity() {
         setContent {
             var hour by remember { mutableStateOf("0") }
             var minute by remember { mutableStateOf("0") }
+            var second by remember { mutableStateOf("-1") }
             var amOrPm by remember { mutableStateOf("0") }
-            val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
-            mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
             LockOrientation()
             Background()
             SubHeader()
             Header()
-            ConstraintBoxes(hour = hour, minute = minute, amOrPm = amOrPm)
-
+            ConstraintBoxes(hour = hour, minute = minute, second = second, amOrPm = amOrPm)
             LaunchedEffect(Unit) {
                 while (true) {
                     val cal = Calendar.getInstance()
@@ -74,27 +79,38 @@ class MainActivity : ComponentActivity() {
                     minute = cal.get(Calendar.MINUTE).run {
                         if (this.toString().length == 1) "0$this" else "$this"
                     }
+                    second = cal.get(Calendar.SECOND).toString()
                     amOrPm = cal.get(Calendar.AM_PM).run {
                         if (this == Calendar.AM) "AM" else "PM"
                     }
                     delay(1000)
                 }
             }
-            val hr = "03"
-            val min = "26"
-            val timeOfDay = "PM"
-            if (hour == hr && minute == min && amOrPm == timeOfDay) {
-                mediaPlayer.start()
-                val intent = Intent(this, MathGame::class.java)
-                startActivity(intent)
-            }
+
+//            val hr = "09"
+//            val min = "54"
+//            val timeOfDay = "PM"
+//            if (hour == hr && minute == min && amOrPm == timeOfDay && second == "0") {
+//                val intent = Intent(this, MathGame::class.java)
+//                startActivity(intent)
+//            }
         }
+
+        Log.d(TAG, "Starting Periodic Work")
+        val workManager = WorkManager.getInstance(application)
+        workManager.enqueue(OneTimeWorkRequestBuilder<HelloWorker>().build())
+        val timeCheckRequest: OneTimeWorkRequest =
+            OneTimeWorkRequestBuilder<timeCheckWorker>()
+                .build()
+        workManager.enqueueUniqueWork("Time Checking", ExistingWorkPolicy.KEEP, timeCheckRequest)
+
     }
 
     @Composable
-    fun ConstraintBoxes(
+    private fun ConstraintBoxes(
         hour: String,
         minute: String,
+        second: String,
         amOrPm: String,
     ) {
         ConstraintLayout {
@@ -159,6 +175,7 @@ class MainActivity : ComponentActivity() {
         Button(
             onClick = {
                 val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
+                navigate.putExtra("BUTTON_INDEX", -1)
                 startActivity(navigate)
             },
             colors = ButtonDefaults.buttonColors(
@@ -171,6 +188,7 @@ class MainActivity : ComponentActivity() {
 
         ) {}
     }
+
     @Composable
     fun ScrollButtons() {
         val state = rememberScrollState()
@@ -188,7 +206,7 @@ class MainActivity : ComponentActivity() {
                     val activeDays = getActiveDays(alarm.dayOfWeek)
                     Button(
                         onClick = {
-                            val navigate = Intent(this@MainActivity, ButtonData::class.java)
+                            val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
                             navigate.putExtra("BUTTON_INDEX", index)
                             startActivity(navigate)
                         },
@@ -214,7 +232,7 @@ class MainActivity : ComponentActivity() {
                                     }
                             ){
                                 Text(
-                                    text = "${alarm.hour}:${alarm.minutes} ${alarm.meridiem}",
+                                    text = "${alarm.hour}:${doubledigit(alarm.minute)} ${alarm.meridiem}",
                                     style = LocalTextStyle.current.merge(
                                         TextStyle(
                                             platformStyle = PlatformTextStyle(
@@ -296,7 +314,7 @@ fun OnOffButton() {
 }
 
 @Composable
-fun DigitalClockComponent(
+fun DigitalClockComponent (
     hour: String,
     minute: String,
     amOrPm: String,
@@ -308,4 +326,48 @@ fun DigitalClockComponent(
         fontFamily = fontFamily,
         fontWeight = FontWeight.ExtraBold
     )
+}
+/*
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
+            ButtonID(idNum = buttonIndex)
+
+        }
+    }
+
+    @Composable
+    fun ButtonID(idNum: Int) {
+        if (idNum != -1) {
+            when (idNum) {
+                idNum -> {
+                    val intent = Intent(this, AlarmSettings::class.java)
+                    startActivity(intent)
+                }
+            }
+        }
+    }
+ */
+
+
+class HelloWorker(appContext: Context, workerParams: WorkerParameters):
+    Worker(appContext, workerParams) {
+    override fun doWork(): Result {
+
+        Log.d(TAG, "hello world")
+
+        // Indicate whether the work finished successfully with the Result
+        return Result.success()
+    }
+}
+
+fun doubledigit(num: String): String {
+    val numInt = num.toIntOrNull() ?: return num // Convert to Int, return original string if conversion fails
+
+    return if (numInt in 0..9) {
+        "0$numInt" // Add leading zero if numInt is between 0 and 9
+    } else {
+        num // Return original string if numInt is not between 0 and 9
+    }
 }

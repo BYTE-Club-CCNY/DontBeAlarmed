@@ -1,10 +1,10 @@
 package com.example.myapplication
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.widget.NumberPicker
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -27,6 +27,7 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -44,54 +46,115 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavController
-import com.example.myapplication.database.createAlarmInJson
-import com.example.myapplication.ui.theme.Alarm
+import com.example.myapplication.database.clearJson
+import com.example.myapplication.database.logAlarm
+import com.example.myapplication.database.readData
+import com.example.myapplication.database.tempAlarm
 import com.example.myapplication.ui.theme.Dandelion
 import com.example.myapplication.ui.theme.Dark_Purple
 import com.example.myapplication.ui.theme.Sunset_Orange
+import kotlinx.coroutines.delay
+import java.util.Calendar
 
-
-var firstAlarm = Alarm(1, true, 1, 0)
-var tempAlarm = Alarm(0,true,0,0)
-internal lateinit var mediaPlayer: MediaPlayer
+var temp = tempAlarm( "", "00", "00", "AM", true, 1, 1,
+    mutableMapOf(
+        "Sun" to false,
+        "Mon" to false,
+        "Tue" to false,
+        "Wed" to false,
+        "Thu" to false,
+        "Fri" to false,
+        "Sat" to false
+    ))
+var copyAlarm = temp
+var alarmid = -1
+var backtext = ""
 
 class AlarmSettings : ComponentActivity() {
-    private val navController = NavController(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            tempAlarm = firstAlarm
+
             Background()
             SubHeader()
             Header()
-            SettingsPage(this@AlarmSettings, navController)        }
+
+            var hour by remember { mutableStateOf("0") }
+            var minute by remember { mutableStateOf("0") }
+            var amOrPm by remember { mutableStateOf("0") }
+
+            LaunchedEffect(Unit) {
+                while (true) {
+                    val cal = Calendar.getInstance()
+                    hour = cal.get(Calendar.HOUR).run {
+                        if (this.toString().length == 1) "0$this" else "$this"
+                    }
+                    minute = cal.get(Calendar.MINUTE).run {
+                        if (this.toString().length == 1) "0$this" else "$this"
+                    }
+                    amOrPm = cal.get(Calendar.AM_PM).run {
+                        if (this == Calendar.AM) "AM" else "PM"
+                    }
+                    delay(1000)
+                }
+            }
+
+            val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
+            alarmid = buttonIndex
+            if (alarmid != -1){
+                backtext = "Delete"
+            }
+            else {
+                backtext = "Back"
+            }
+            SettingsPage(hour = hour, minute = minute, amOrPm = amOrPm, buttonID = buttonIndex)
+        }
         mediaPlayer = MediaPlayer.create(applicationContext, R.raw.alarm_sound_1)
     }
 
     @Composable
-    fun SettingsPage(context: Context, navController: NavController) {
+    fun SettingsPage (
+        hour: String,
+        minute: String,
+        amOrPm: String,
+        buttonID: Int
+    ) {
+        val alarms = remember { readData(this) }
+        if (buttonID != -1) {
+            // If the index is valid and the alarms list is not null
+            alarms?.let { alarmsList ->
+                if (buttonID < alarmsList.size) {
+                    // If the index is within the range of the list
+                    copyAlarm = alarmsList[buttonID]
+                }
+            }
+        }
+        else{
+            copyAlarm = temp
+        }
         ConstraintLayout {
+            val context = LocalContext.current
             //header notifying next alarm time
-            val (blankBox, titleBox, timeBox, optionBox, nextBox) = createRefs()
+            Text(
+                text = "Title $buttonID",
+                color =  Dark_Purple,
+                fontSize = 35.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.ExtraBold
+            )
+            val (blankBox, titleBox, timeBox, optionBox) = createRefs()
             //blankbox = Header
             Box(
+                contentAlignment = Alignment.Center,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(225.dp)
                     .constrainAs(blankBox) {}
                     .background(Color.Transparent)
-                    .padding(top = 60.dp)
-                    .padding(horizontal = 20.dp)
             ) {
                 Column() {
-                    Text(
-                        text = "Next Alarm in: ...",
-                        color = Dark_Purple,
-                        fontSize = 45.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.Medium
-                    )
+                    DigitalClockComponent(hour = hour, minute = minute, amOrPm = amOrPm)
                 }
             }
             //section to input title for alarm
@@ -121,9 +184,9 @@ class AlarmSettings : ComponentActivity() {
                     }
                     .background(Color.Transparent)
             ) {
-                var selectedHour by remember { mutableStateOf(1) }
-                var selectedMinute by remember { mutableStateOf(0) }
-                var selectedPeriod by remember { mutableStateOf(1) }
+                var selectedHour by remember { mutableStateOf(copyAlarm.hour.toIntOrNull()!!) }
+                var selectedMinute by remember { mutableStateOf(copyAlarm.minute.toIntOrNull()!!) }
+                var selectedMeridiem by remember { mutableStateOf(meridiemConvertToInt(copyAlarm.meridiem)) }
                 ConstraintLayout {
                     val (hourBox, colonBox, minuteBox, timeOfDay, spacerBox) = createRefs()
                     Box(
@@ -136,10 +199,10 @@ class AlarmSettings : ComponentActivity() {
 
                     ) {
                         HourPicker(
-                            selectedHour = tempAlarm.hour,
+                            selectedHour = copyAlarm.hour.toIntOrNull()!!,
                             onHourSelected = { hour ->
                                 selectedHour = hour
-                                tempAlarm.hour = selectedHour
+                                copyAlarm.hour = selectedHour.toString()
                             }
                         )
                     }
@@ -165,10 +228,10 @@ class AlarmSettings : ComponentActivity() {
                             .constrainAs(minuteBox) {}
                     ) {
                         MinutePicker(
-                            selectedMinute = tempAlarm.minute,
+                            selectedMinute = copyAlarm.minute.toIntOrNull()!!,
                             onMinuteSelected = { minute ->
                                 selectedMinute = minute
-                                tempAlarm.minute = selectedMinute
+                                copyAlarm.minute = selectedMinute.toString()
                             }
                         )
                     }
@@ -188,11 +251,11 @@ class AlarmSettings : ComponentActivity() {
                             .height(100.dp)
                             .constrainAs(timeOfDay) {}
                     ) {
-                        DayPeriodPicker(
-                            selectedPeriod = tempAlarm.period,
+                        MeridiemPicker(
+                            selectedPeriod = meridiemConvertToInt(copyAlarm.meridiem),
                             onPeriodSelected = { period ->
-                                selectedPeriod = period
-                                tempAlarm.period = selectedPeriod
+                                selectedMeridiem = period
+                                copyAlarm.meridiem = meridiemConvertToString(selectedMeridiem)
                             }
                         )
                     }
@@ -209,7 +272,7 @@ class AlarmSettings : ComponentActivity() {
                     }
             ) {
                 ConstraintLayout {
-                    val (weekBox, activityBox, soundBox, nextBox) = createRefs()
+                    val (weekBox, activityBox, soundBox,  nextBox) = createRefs()
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -265,11 +328,13 @@ class AlarmSettings : ComponentActivity() {
                             )
                             Box(
                                 modifier = Modifier
-                                    .width(195.dp)
+                                    .width(200.dp)
                                     .align(Alignment.CenterVertically), contentAlignment = Alignment.Center
                             )
                             {
-                                ActivityButton()
+                                Row (){
+                                    ActivityButtons()
+                                }
                             }
                         }
                     }
@@ -328,10 +393,10 @@ class AlarmSettings : ComponentActivity() {
                     )
                     {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            BackButton()
+                            BackButton(context)
                             Spacer(modifier = Modifier
                                 .width(125.dp))
-                            SaveButton(context, navController)
+                            SaveButton(context, buttonID)
                         }
                     }
                 }
@@ -339,12 +404,14 @@ class AlarmSettings : ComponentActivity() {
         }
     }
 
+
     private @Composable
-    fun BackButton() {
+    fun BackButton(context: Context) {
+        val alarms = remember { readData(context) }
         Button(
             content = {
                 Text(
-                    text = "Back",
+                    text = backtext,
                     style = LocalTextStyle.current.merge(
                         TextStyle(
                             platformStyle = PlatformTextStyle(
@@ -364,6 +431,17 @@ class AlarmSettings : ComponentActivity() {
             },
             onClick =
             {
+                if (alarmid != -1) {
+                    clearJson(context)
+                    if (alarms != null) {
+                        alarms.forEachIndexed { index, alarm ->
+                            if (alarmid == index) {
+                                return@forEachIndexed
+                            }
+                            logAlarm(context, alarm)
+                        }
+                    }
+                }
                 val nav = Intent(this, MainActivity::class.java)
                 startActivity(nav)
             },
@@ -380,56 +458,56 @@ class AlarmSettings : ComponentActivity() {
 
     @Preview
     @Composable
-    fun ActivityButton() {
-    var activityText = ""
-    if(tempAlarm.activities == 0){
-        activityText = "New"
-    }
-    else
-    {
-        activityText = "${tempAlarm.activities}"
-    }
-        Button(
-            content = {
-                Text(
-                    text = activityText,
-                    style = LocalTextStyle.current.merge(
-                        TextStyle(
-                            platformStyle = PlatformTextStyle(
-                                includeFontPadding = false
-                            ),
-                            lineHeightStyle = LineHeightStyle(
-                                alignment = LineHeightStyle.Alignment.Center,
-                                trim = LineHeightStyle.Trim.None
+    fun ActivityButtons() {
+        var selectedActivity by remember { mutableStateOf(copyAlarm.gameType) }
+        for (i in 1..2) {
+            var selected = selectedActivity == i
+            val color = if (!selected) Dark_Purple else Dandelion//off else on
+            val textColor = if (!selected) Dandelion else Dark_Purple //off else on
+            val activityText = if (i == 1) "None" else "Math"
+            Button(
+                content = {
+                    Text(
+                        text = activityText,
+                        style = LocalTextStyle.current.merge(
+                            TextStyle(
+                                platformStyle = PlatformTextStyle(
+                                    includeFontPadding = false
+                                ),
+                                lineHeightStyle = LineHeightStyle(
+                                    alignment = LineHeightStyle.Alignment.Center,
+                                    trim = LineHeightStyle.Trim.None
+                                )
                             )
-                        )
-                    ),
-                    color = Dark_Purple,
-                    fontSize = 15.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            onClick =
-            {
-                val nav = Intent(this, ActivityChoice::class.java)
-                startActivity(nav)
-            },
-            shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Dandelion,
-                contentColor = Dark_Purple,
-            ),
-            contentPadding = PaddingValues(0.dp),
-            modifier = Modifier
-                .height(40.dp)
-                .width(80.dp)
-        )
+                        ),
+                        color = textColor,
+                        fontSize = 15.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                onClick =
+                {
+                    selectedActivity = i
+                    copyAlarm.gameType = selectedActivity
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = color,
+                ),
+                contentPadding = PaddingValues(0.dp),
+                modifier = Modifier
+                    .height(40.dp)
+                    .width(100.dp)
+                    .padding(horizontal = 10.dp)
+            )
+        }
     }
+}
 
     @Composable
     fun SoundButtons() {
-        var selectedSound by remember { mutableStateOf(tempAlarm.sound) }
+        var selectedSound by remember { mutableStateOf(copyAlarm.sound) }
         for (i in 1..2) {
             var selected = selectedSound == i
             val color = if (!selected) Dark_Purple else Dandelion//off else on
@@ -463,7 +541,7 @@ class AlarmSettings : ComponentActivity() {
                     }
                     mediaPlayer.start()
                     selectedSound = i
-                    tempAlarm.sound = selectedSound
+                    copyAlarm.sound = selectedSound
                 },
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -478,61 +556,59 @@ class AlarmSettings : ComponentActivity() {
 
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-}
 @Composable
-fun SaveButton(context: Context, navController: NavController) {
+fun SaveButton(context: Context, buttonID: Int) { // Pass AlarmDBHelper instance
+    val alarms = remember { readData(context) }
     Button(
-        onClick = { saveAlarm(context)
-            navController.navigate("main")},
-        shape = RoundedCornerShape(20.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Sunset_Orange,
-            contentColor = Dark_Purple,
-        ),
-        contentPadding = PaddingValues(0.dp),
+        onClick = {
+
+            // Your logic to save the alarm
+            // Assuming firstAlarm and copyAlarm are defined elsewhere
+            if (buttonID != -1 && alarms != null) {
+                clearJson(context)
+                alarms.forEachIndexed { index, alarm ->
+                    if (buttonID == index) {
+                        logAlarm(context, copyAlarm)
+                        return@forEachIndexed
+                    }
+                    logAlarm(context, alarm)
+                }
+            }
+            else{
+                logAlarm(context, copyAlarm)
+            }
+            val nav = Intent(context, MainActivity::class.java)
+            context.startActivity(nav)
+        },
         modifier = Modifier
             .height(40.dp)
-            .width(80.dp)
+            .width(80.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Dandelion, // Change color as per your requirement
+            contentColor = Color.Black
+        )
     ) {
         Text(
             text = "Save",
-            style = LocalTextStyle.current.merge(
-                TextStyle(
-                    platformStyle = PlatformTextStyle(
-                        includeFontPadding = false
-                    ),
-                    lineHeightStyle = LineHeightStyle(
-                        alignment = LineHeightStyle.Alignment.Center,
-                        trim = LineHeightStyle.Trim.None
-                    ),
-                    fontSize = 15.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight.Light,
-                    color = Dark_Purple
-                )
-            ),
-            modifier = Modifier.padding(horizontal = 10.dp)
+            style = TextStyle(
+                fontSize = 15.sp,
+                color = Dark_Purple
+            )
         )
     }
 }
-
-
 @Preview
 @Composable
 fun WeekDayButtons() {
-    for(i in 1..7) {
-
-        var selected by remember { mutableStateOf(tempAlarm.weekDays[i]) }
+    for ((day, status) in copyAlarm.dayOfWeek) {
+        var selected by remember { mutableStateOf(status) }
         val color = if (selected) Dandelion else Dark_Purple//colorchange
         val textColor = if (selected) Dark_Purple else Dandelion //colorchange
         Button(
             content = {
                 Text(
-                    text = WeekDayConvert(i),
+                    text = WeekDayToLetterConvert(day),
                     style = LocalTextStyle.current.merge(
                         TextStyle(
                             platformStyle = PlatformTextStyle(
@@ -553,7 +629,7 @@ fun WeekDayButtons() {
             onClick =
             {
                 selected = !selected
-                tempAlarm.weekDays[i] = selected
+                copyAlarm.dayOfWeek[day] = selected
             },
             colors= ButtonDefaults.buttonColors(containerColor = color),
             shape = RoundedCornerShape(20.dp),
@@ -569,15 +645,15 @@ fun WeekDayButtons() {
 fun AlarmTitleInputBox() {
     // auto shows original first alarm name in the text field
     var text by remember {
-        mutableStateOf(tempAlarm.title)
+        mutableStateOf("${copyAlarm.title}")
     }
         TextField(
             shape = RoundedCornerShape(15.dp),
             value = text,
             onValueChange = {
                 text = it
-                tempAlarm.title = text },
-            placeholder = { Text("Add Title") },
+                copyAlarm.title = text },
+            placeholder = { Text("${copyAlarm.title}") },
             maxLines = 1,
             textStyle = TextStyle(
                 color = Dark_Purple,
@@ -610,7 +686,6 @@ fun HourPicker(selectedHour: Int, onHourSelected: (Int) -> Unit) {
     }
 }
 
-@SuppressLint("DefaultLocale")
 @Composable
 fun MinutePicker(selectedMinute: Int, onMinuteSelected: (Int) -> Unit) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
@@ -627,7 +702,7 @@ fun MinutePicker(selectedMinute: Int, onMinuteSelected: (Int) -> Unit) {
                     setOnValueChangedListener { _, _, newVal ->
                         onMinuteSelected(newVal) // Notify when minute selected
                     }
-                    setFormatter(NumberPicker.Formatter { i -> String.format("%02d", i) })
+                    setFormatter({ i -> String.format("%02d", i) })
                 }
             }
         )
@@ -635,14 +710,14 @@ fun MinutePicker(selectedMinute: Int, onMinuteSelected: (Int) -> Unit) {
 }
 
 @Composable
-fun DayPeriodPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
+fun MeridiemPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         AndroidView(
             modifier = Modifier.fillMaxWidth(),
             factory = { context ->
                 NumberPicker(context).apply {
-                    minValue = 0 // am value
-                    maxValue = 1 // pm value
+                    minValue = 1 // am value
+                    maxValue = 2 // pm value
                     value = selectedPeriod // Initial selected period
                     textSize = 70f
                     textColor = 4281802289.toInt()
@@ -655,49 +730,49 @@ fun DayPeriodPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
             }
         )
     }
+
 }
 
 
-fun WeekDayConvert (weekDay: Int): String {
-    var dayNumber = ""
-    if (weekDay == 1)
-        dayNumber = "S"
-    if (weekDay == 2)
-        dayNumber = "M"
-    if (weekDay == 3)
-        dayNumber = "T"
-    if (weekDay == 4)
-        dayNumber = "W"
-    if (weekDay == 5)
-        dayNumber = "T"
-    if (weekDay == 6)
-        dayNumber = "F"
-    if (weekDay == 7)
-        dayNumber = "S"
-    return dayNumber
+fun WeekDayToLetterConvert (weekDay: String): String {
+    var dayLetter = ""
+    if (weekDay == "Sun")
+        dayLetter = "S"
+    if (weekDay == "Mon")
+        dayLetter = "M"
+    if (weekDay == "Tue")
+        dayLetter = "T"
+    if (weekDay == "Wed")
+        dayLetter = "W"
+    if (weekDay == "Thu")
+        dayLetter = "T"
+    if (weekDay == "Fri")
+        dayLetter = "F"
+    if (weekDay == "Sat")
+        dayLetter = "S"
+    return dayLetter
 }
 
-
-fun saveAlarm(context: Context) {
-    createAlarmInJson(
-        context = context,
-        title = tempAlarm.title,
-        hour = tempAlarm.hour,
-        minutes = tempAlarm.minute,
-        meridiem = if (tempAlarm.period == 0) "AM" else "PM",
-        on = true,
-        sound = tempAlarm.sound,
-        gameType = tempAlarm.activities,
-        dayOfWeek = booleanArrayToMap(tempAlarm.weekDays)
-    )
+fun meridiemConvertToInt(meridiem: String): Int {
+    if (meridiem == "AM"){
+        return 1
+    }
+    if (meridiem == "PM"){
+        return 2
+    }
+    else {
+        return -1
+    }
 }
 
-fun booleanArrayToMap(booleanArray: BooleanArray): Map<String, Boolean> {
-    val daysOfWeek = arrayOf("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
-    return daysOfWeek.zip(booleanArray.toList()).toMap()
+fun meridiemConvertToString(meridiem: Int): String {
+    if (meridiem == 1){
+        return "AM"
+    }
+    if (meridiem == 2){
+        return "PM"
+    }
+    else {
+        return ""
+    }
 }
-
-
-
-
-

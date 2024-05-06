@@ -1,12 +1,12 @@
 package com.example.myapplication.database
 
 data class tempAlarm(
-    val title: String,
-    val hour: Int,
-    val minutes: Int,
-    val meridiem: String,
-    val On: Boolean,
-    val sound: Int,
-    val gameType: Int,
-    val dayOfWeek: Map<String, Boolean> // New variable
-)
+    var title: String,
+    var hour: String,
+    var minute: String,
+    var meridiem: String,
+    var alarmStatus: Boolean,
+    var sound: Int,
+    var gameType: Int,
+    var dayOfWeek: MutableMap<String, Boolean> // New variable
+){}

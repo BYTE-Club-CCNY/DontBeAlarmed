@@ -2,91 +2,103 @@ package com.example.myapplication.database
 
 import android.content.Context
 import android.util.Log
-import com.example.myapplication.R
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
 import java.io.BufferedReader
-import java.io.File
-import java.io.FileWriter
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.IOException
 import java.io.InputStreamReader
 import kotlin.collections.MutableList
 
 
 
 
-data class Alarmsettings(
-    val title: String,
-    val hour: Int,
-    val minutes: Int,
-    val meridiem: String,
-    val on: Boolean,
-    val sound: Int,
-    val gameType: Int,
-    val dayOfWeek: Map<String, Boolean>
-)
-fun readData(context: Context): MutableList<Alarmsettings>? {
+
+fun readData(context: Context): MutableList<tempAlarm>? {
     val gson = Gson()
     return try {
-        context.resources.openRawResource(R.raw.data).use { inputStream ->
+        context.openFileInput("alarms.json").use { inputStream ->
             BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                gson.fromJson(reader, Array<Alarmsettings>::class.java).toMutableList()
+                gson.fromJson(reader, Array<tempAlarm>::class.java).toMutableList()
             }
         }
+    } catch (e: FileNotFoundException) {
+        // If the file is not found, return null or an empty list depending on your logic
+        null
     } catch (e: JsonSyntaxException) {
-
         Log.e("readData", "Failed to parse the JSON data", e)
         null
     } catch (e: Exception) {
-
-        Log.e("readData", "Error reading from raw resource", e)
+        Log.e("readData", "Error reading from internal storage", e)
         null
     }
 }
 
-private fun writeData(context: Context, data: Array<Alarmsettings>?) {
-    val file = File(context.filesDir, "data.json")
-    val writer = FileWriter(file)
-    Gson().toJson(data, writer)
-    writer.close()
+fun logAlarm(context: Context, alarm: tempAlarm) {
+    val existingContent = readJsonData(context)
+    val jsonArray = try {
+        JSONArray(existingContent)
+    } catch (e: JSONException) {
+        JSONArray()
+    }
+
+    val alarmObject = JSONObject()
+    try {
+        alarmObject.put("title", alarm.title)
+        alarmObject.put("hour", alarm.hour)
+        alarmObject.put("minute", alarm.minute)
+        alarmObject.put("meridiem", alarm.meridiem)
+        alarmObject.put("alarmStatus", alarm.alarmStatus)
+        alarmObject.put("sound", alarm.sound)
+        alarmObject.put("gameType", alarm.gameType)
+
+        val dayOfWeekJson = JSONObject()
+        alarm.dayOfWeek.forEach { (key, value) ->
+            dayOfWeekJson.put(key, value)
+        }
+        alarmObject.put("dayOfWeek", dayOfWeekJson)
+
+        jsonArray.put(alarmObject)
+
+        val jsonString = jsonArray.toString()
+
+        context.openFileOutput("alarms.json", Context.MODE_PRIVATE).use { outputStream ->
+            outputStream.write(jsonString.toByteArray())
+        }
+    } catch (e: JSONException) {
+        e.printStackTrace()
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
 }
 
-
-fun createAlarmInJson(
-    context: Context,
-    title: String,
-    hour: Int,
-    minutes: Int,
-    meridiem: String,
-    on: Boolean,
-    sound: Int,
-    gameType: Int,
-    dayOfWeek: Map<String, Boolean>
-) {
-    val alarms = readData(context) ?: mutableListOf()
-
-    val alarm = Alarmsettings(
-        title = title,
-        hour = hour,
-        minutes = minutes,
-        meridiem = meridiem,
-        on = on,
-        sound = sound,
-        gameType = gameType,
-        dayOfWeek = dayOfWeek
-    )
-
-    alarms.add(alarm)
-
-    val alarmsArray = alarms.toTypedArray()
-
-    writeData(context, alarmsArray)
-
-    Log.d("test","Alarm created successfully.")
+private fun readJsonData(context: Context): String {
+    return try {
+        val fis: FileInputStream = context.openFileInput("alarms.json")
+        val isr = InputStreamReader(fis)
+        val bufferedReader = BufferedReader(isr)
+        val sb = StringBuilder()
+        var line: String?
+        while (bufferedReader.readLine().also { line = it } != null) {
+            sb.append(line)
+        }
+        sb.toString()
+    } catch (e: IOException) {
+        ""
+    }
 }
-
+fun clearJson(context: Context) {
+    context.openFileOutput("alarms.json", Context.MODE_PRIVATE).use { outputStream ->
+        outputStream.write("".toByteArray())
+    }
+}
 fun getActiveDays(dayOfWeek: Map<String, Boolean>): String {
     val daysOrder = listOf("Mon", "Tus", "Wed", "Thu", "Fri", "Sat", "Sun")
     return daysOrder.map { day ->
-        if (dayOfWeek[day] == true) day.first() else ' '
+        if (dayOfWeek[day] == true) day.first() else ""
     }.joinToString(separator = "   ")
 }
