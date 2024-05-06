@@ -8,4 +8,5 @@
     <string name="title_activity_button_data">ButtonData</string>
     <string name="title_activity_alarm_setting">AlarmSetting</string>
     <string name="title_activity_math_game">MathGame</string>
+    <string name="title_activity_no_game">NoGame</string>
 </resources>
