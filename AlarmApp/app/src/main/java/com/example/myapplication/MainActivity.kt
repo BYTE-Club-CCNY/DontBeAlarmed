@@ -139,7 +139,7 @@ class MainActivity : ComponentActivity() {
                     .padding(top = 60.dp)
                     .padding(horizontal = 20.dp)
             ) {
-                DigitalClockComponent(hour = hour, minute = minute, amOrPm = amOrPm)
+                DigitalClockComponent(if (hour == "00") "12" else hour, minute, amOrPm)
             }
             Box(
                 modifier = Modifier
@@ -216,7 +216,7 @@ class MainActivity : ComponentActivity() {
                                     }
                             ){
                                 Text(
-                                    text = "${alarm.hour}:${doubledigit(alarm.minute)} ${alarm.meridiem}",
+                                    text = "${if (alarm.hour == "00") "12" else alarm.hour}:${doubledigit(alarm.minute)} ${alarm.meridiem}",
                                     style = LocalTextStyle.current.merge(
                                         TextStyle(
                                             platformStyle = PlatformTextStyle(

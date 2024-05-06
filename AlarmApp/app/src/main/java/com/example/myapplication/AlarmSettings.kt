@@ -154,7 +154,7 @@ class AlarmSettings : ComponentActivity() {
                     .background(Color.Transparent)
             ) {
                 Column() {
-                    DigitalClockComponent(hour = hour, minute = minute, amOrPm = amOrPm)
+                    DigitalClockComponent(if (hour == "00") "12" else hour, minute, amOrPm)
                 }
             }
             //section to input title for alarm
