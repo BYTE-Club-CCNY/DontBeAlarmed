@@ -93,7 +93,7 @@ fun clearJson(context: Context) {
     }
 }
 fun getActiveDays(dayOfWeek: Map<String, Boolean>): String {
-    val daysOrder = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+    val daysOrder = listOf("Sun","Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
     return daysOrder.map { day ->
         if (dayOfWeek[day] == true) day.first() else ""
     }.joinToString(separator = "   ")
