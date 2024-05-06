@@ -181,7 +181,7 @@ class MainActivity : ComponentActivity() {
                     val activeDays = getActiveDays(alarm.dayOfWeek)
                     Button(
                         onClick = {
-                            val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
+                            val navigate = Intent(this@MainActivity, MathGame::class.java)
                             navigate.putExtra("BUTTON_INDEX", index)
                             startActivity(navigate)
                         },
@@ -249,7 +249,7 @@ class MainActivity : ComponentActivity() {
                                             )
                                         )
                                     ),
-                                    text = activeDays,
+                                    text = "  $activeDays",
                                     textAlign = TextAlign.Center,
                                     color = Dark_Purple,
                                     fontSize = 15.sp,
@@ -349,28 +349,6 @@ fun DigitalClockComponent (
         fontWeight = FontWeight.ExtraBold
     )
 }
-/*
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
-            ButtonID(idNum = buttonIndex)
-
-        }
-    }
-
-    @Composable
-    fun ButtonID(idNum: Int) {
-        if (idNum != -1) {
-            when (idNum) {
-                idNum -> {
-                    val intent = Intent(this, AlarmSettings::class.java)
-                    startActivity(intent)
-                }
-            }
-        }
-    }
- */
 
 fun doubledigit(num: String): String {
     val numInt = num.toIntOrNull() ?: return num // Convert to Int, return original string if conversion fails

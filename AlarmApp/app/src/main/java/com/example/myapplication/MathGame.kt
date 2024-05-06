@@ -63,10 +63,10 @@ class MathGame : ComponentActivity() {
                 var operation by remember { mutableStateOf((0..2).random()) }
                 val ans = GenerateEquationAns(num[0], num[1], operation)
                 Box(
-                    contentAlignment = Alignment.TopCenter,
+                    contentAlignment = Alignment.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(240.dp)
+                        .height(245.dp)
                         .constrainAs(questionBox) {}
                         .background(Color.Transparent)
                 ) {
@@ -78,7 +78,7 @@ class MathGame : ComponentActivity() {
                             top.linkTo(textBox.bottom)
                         }
                         .padding(horizontal = 5.dp)
-                        .padding(vertical = 15.dp)
+                        .padding(vertical = 25.dp)
 
                 ){
                     Button(
@@ -104,7 +104,7 @@ class MathGame : ComponentActivity() {
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(4284563290),
+                            containerColor = Color(4294493562),
                         ),
                         modifier = Modifier
                             .padding(horizontal = 10.dp)
@@ -133,6 +133,15 @@ class MathGame : ComponentActivity() {
                 }
 
                 Text(
+                    style = LocalTextStyle.current.merge(
+                        TextStyle(
+                            platformStyle = PlatformTextStyle(includeFontPadding = false),
+                            lineHeightStyle = LineHeightStyle(
+                                alignment = LineHeightStyle.Alignment.Center,
+                                trim = LineHeightStyle.Trim.None
+                            )
+                        )
+                    ),
                     text = "  $count/5",
                     color =  Dark_Purple,
                     fontSize = 35.sp,
@@ -141,12 +150,6 @@ class MathGame : ComponentActivity() {
                 )
                 TextField(
                     value = phoneValue,
-                    colors = textFieldColors(
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color(4284563290),
-                        containerColor = Color(4284563290)
-
-                    ),
                     shape = RoundedCornerShape(10.dp),
                     onValueChange = { phoneValue = it },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -194,10 +197,11 @@ fun PrintGenerateEquation (num1: Int, num2: Int, operation:Int) {
     var ans = 0
     val operator = remember { listOf("+", "-", "*") }
     Box(
-        contentAlignment = Alignment.Center,
+        contentAlignment = Alignment.BottomCenter,
         modifier = Modifier
-            .height(250.dp)
-            .width(250.dp)
+            .height(235.dp)
+            .fillMaxWidth()
+            .padding(50.dp)
             .background(Color.Transparent)
     ){
         ans = if (operation == 0) {

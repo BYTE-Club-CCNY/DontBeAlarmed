@@ -23,9 +23,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -146,16 +148,15 @@ class AlarmSettings : ComponentActivity() {
             val (blankBox, titleBox, timeBox, optionBox) = createRefs()
             //blankbox = Header
             Box(
-                contentAlignment = Alignment.Center,
+                contentAlignment = Alignment.BottomCenter,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(225.dp)
+                    .padding(vertical = 40.dp)
                     .constrainAs(blankBox) {}
                     .background(Color.Transparent)
             ) {
-                Column() {
-                    DigitalClockComponent(if (hour == "00") "12" else hour, minute, amOrPm)
-                }
+                DigitalClockComponent(if (hour == "00") "12" else hour, minute, amOrPm)
             }
             //section to input title for alarm
             //title box = name of the alarm box
@@ -640,6 +641,7 @@ fun WeekDayButtons() {
         )
     }
 }
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun AlarmTitleInputBox() {
@@ -656,11 +658,12 @@ fun AlarmTitleInputBox() {
             placeholder = { Text("${copyAlarm.title}") },
             maxLines = 1,
             textStyle = TextStyle(
+                fontSize = 25.sp,
                 color = Dark_Purple,
-                fontWeight = FontWeight.Medium
+                fontFamily = fontFamily,
+                fontWeight = FontWeight.ExtraBold,
             ),
             modifier = Modifier
-                .padding(5.dp)
                 .width(325.dp)
         )
 }
@@ -675,7 +678,7 @@ fun HourPicker(selectedHour: Int, onHourSelected: (Int) -> Unit) {
                     minValue = 1 // Minimum hour value
                     maxValue = 12 // Maximum hour value
                     value = selectedHour // Initial selected hour
-                    textSize = 70f
+                    textSize = 75f
                     textColor = 4281802289.toInt()
                     setOnValueChangedListener { _, _, newVal ->
                         onHourSelected(newVal) // Notify when hour selected
@@ -696,7 +699,7 @@ fun MinutePicker(selectedMinute: Int, onMinuteSelected: (Int) -> Unit) {
                     minValue = 0 // Minimum minute value
                     maxValue = 59 // Maximum minute value
                     value = selectedMinute // Initial selected minute
-                    textSize = 70f
+                    textSize = 75f
                     textColor = 4281802289.toInt()
 
                     setOnValueChangedListener { _, _, newVal ->
@@ -719,7 +722,7 @@ fun MeridiemPicker(selectedPeriod: Int, onPeriodSelected: (Int) -> Unit) {
                     minValue = 1 // am value
                     maxValue = 2 // pm value
                     value = selectedPeriod // Initial selected period
-                    textSize = 70f
+                    textSize = 75f
                     textColor = 4281802289.toInt()
                     setOnValueChangedListener { _, _, newVal ->
                         onPeriodSelected(newVal) // Notify when period selected
