@@ -97,6 +97,11 @@ class MathGame : ComponentActivity() {
                                     operation = (0..2).random()
                                 }
                             }
+                            else {
+                                phoneValue = ""
+                                num = List(2) { Random.nextInt(0, 13) }
+                                operation = (0..2).random()
+                            }
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(4284563290),
@@ -206,7 +211,7 @@ fun PrintGenerateEquation (num1: Int, num2: Int, operation:Int) {
         Text(
             text = "$num1 ${operator[operation]} $num2",
             color = Dark_Purple,
-            fontSize = 70.sp,
+            fontSize = 65.sp,
             fontFamily = fontFamily,
             fontWeight = FontWeight.ExtraBold,
         )
