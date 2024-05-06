@@ -1,6 +1,5 @@
 package com.example.myapplication
 
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -44,10 +43,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequest
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.example.myapplication.database.getActiveDays
@@ -63,13 +58,12 @@ class MainActivity : ComponentActivity() {
         setContent {
             var hour by remember { mutableStateOf("0") }
             var minute by remember { mutableStateOf("0") }
-            var second by remember { mutableStateOf("-1") }
             var amOrPm by remember { mutableStateOf("0") }
             LockOrientation()
             Background()
             SubHeader()
             Header()
-            ConstraintBoxes(hour = hour, minute = minute, second = second, amOrPm = amOrPm)
+            ConstraintBoxes(hour = hour, minute = minute, amOrPm = amOrPm)
             LaunchedEffect(Unit) {
                 while (true) {
                     val cal = Calendar.getInstance()
@@ -79,10 +73,10 @@ class MainActivity : ComponentActivity() {
                     minute = cal.get(Calendar.MINUTE).run {
                         if (this.toString().length == 1) "0$this" else "$this"
                     }
-                    second = cal.get(Calendar.SECOND).toString()
                     amOrPm = cal.get(Calendar.AM_PM).run {
                         if (this == Calendar.AM) "AM" else "PM"
                     }
+                    TimeCheck()
                     delay(1000)
                 }
             }
@@ -95,22 +89,12 @@ class MainActivity : ComponentActivity() {
 //                startActivity(intent)
 //            }
         }
-
-        Log.d(TAG, "Starting Periodic Work")
-        val workManager = WorkManager.getInstance(application)
-        workManager.enqueue(OneTimeWorkRequestBuilder<HelloWorker>().build())
-        val timeCheckRequest: OneTimeWorkRequest =
-            OneTimeWorkRequestBuilder<timeCheckWorker>()
-                .build()
-        workManager.enqueueUniqueWork("Time Checking", ExistingWorkPolicy.KEEP, timeCheckRequest)
-
     }
 
     @Composable
     private fun ConstraintBoxes(
         hour: String,
         minute: String,
-        second: String,
         amOrPm: String,
     ) {
         ConstraintLayout {
@@ -291,6 +275,46 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+    fun TimeCheck() {
+// checks each alarm in json file and compares it to current time
+        val cal = Calendar.getInstance()
+        var currentHour = cal.get(Calendar.HOUR).run {
+            if (this.toString().length == 1) "0$this" else "$this"
+        }
+        var currentMinute = cal.get(Calendar.MINUTE).run {
+            if (this.toString().length == 1) "0$this" else "$this"
+        }
+
+        var currentSecond = cal.get(Calendar.SECOND).toString()
+
+        var currentAmOrPm = cal.get(Calendar.AM_PM).run {
+            if (this == Calendar.AM) "AM" else "PM"
+        }
+        var currentDay = cal.get(Calendar.DAY_OF_WEEK).run {
+            when(this) {
+                1 -> "Sun"
+                2 -> "Mon"
+                3 -> "Tue"
+                4 -> "Wed"
+                5 -> "Thu"
+                6 -> "Fri"
+                7 -> "Sat"
+                else -> ""
+            }
+        }
+        val alarms = readData(applicationContext)
+        alarms?.forEachIndexed { index, alarm ->
+            val hr = alarm.hour
+            val min = alarm.minute
+            val timeOfDay = alarm.meridiem
+            if (currentHour == hr && currentMinute == min && currentAmOrPm == timeOfDay && currentSecond.toInt() == 0 && alarm.dayOfWeek[currentDay] == true) {
+                val intent = Intent(applicationContext, MathGame::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
+            }
+
+        }
+    }
 }
 
 @Composable
@@ -350,18 +374,6 @@ fun DigitalClockComponent (
     }
  */
 
-
-class HelloWorker(appContext: Context, workerParams: WorkerParameters):
-    Worker(appContext, workerParams) {
-    override fun doWork(): Result {
-
-        Log.d(TAG, "hello world")
-
-        // Indicate whether the work finished successfully with the Result
-        return Result.success()
-    }
-}
-
 fun doubledigit(num: String): String {
     val numInt = num.toIntOrNull() ?: return num // Convert to Int, return original string if conversion fails
 
@@ -371,3 +383,4 @@ fun doubledigit(num: String): String {
         num // Return original string if numInt is not between 0 and 9
     }
 }
+
