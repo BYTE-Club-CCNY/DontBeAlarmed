@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import com.example.myapplication.database.readData
 import com.example.myapplication.ui.theme.Dark_Purple
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.delay
@@ -40,6 +41,9 @@ import java.util.Calendar
 import kotlin.random.Random
 
 class NoGame : ComponentActivity() {
+    val alarms = readData(applicationContext)
+    val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
+    val alarm = alarms?.get(buttonIndex)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -115,24 +119,26 @@ class NoGame : ComponentActivity() {
                         .fillMaxWidth()
                         .height(100.dp)
                 ) {
-                    Text(
-                        style = LocalTextStyle.current.merge(
-                            TextStyle(
-                                platformStyle = PlatformTextStyle(
-                                    includeFontPadding = false
-                                ),
-                                lineHeightStyle = LineHeightStyle(
-                                    alignment = LineHeightStyle.Alignment.Center,
-                                    trim = LineHeightStyle.Trim.None
+                    alarm?.let {
+                        Text(
+                            style = LocalTextStyle.current.merge(
+                                TextStyle(
+                                    platformStyle = PlatformTextStyle(
+                                        includeFontPadding = false
+                                    ),
+                                    lineHeightStyle = LineHeightStyle(
+                                        alignment = LineHeightStyle.Alignment.Center,
+                                        trim = LineHeightStyle.Trim.None
+                                    )
                                 )
-                            )
-                        ),
-                        text = "Stop",
-                        color = Dark_Purple,
-                        fontSize = 60.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight.ExtraBold,
-                    )
+                            ),
+                            text = it.title,
+                            color = Dark_Purple,
+                            fontSize = 60.sp,
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight.ExtraBold,
+                        )
+                    }
                 }
             }
         }
