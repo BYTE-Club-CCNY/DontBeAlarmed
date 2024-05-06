@@ -67,12 +67,15 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 while (true) {
                     val cal = Calendar.getInstance()
-                    hour = String.format(
-                        "%02d",
-                        cal.get(Calendar.HOUR_OF_DAY)
-                    ) // Use 24-hour format and ensure leading zeros
-                    minute = String.format("%02d", cal.get(Calendar.MINUTE))
-                    amOrPm = if (cal.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
+                    hour = cal.get(Calendar.HOUR).run {
+                        if (this.toString().length == 1) "0$this" else "$this"
+                    }
+                    minute = cal.get(Calendar.MINUTE).run {
+                        if (this.toString().length == 1) "0$this" else "$this"
+                    }
+                    amOrPm = cal.get(Calendar.AM_PM).run {
+                        if (this == Calendar.AM) "AM" else "PM"
+                    }
 
                     TimeCheck()
 
@@ -278,11 +281,17 @@ class MainActivity : ComponentActivity() {
 
     fun TimeCheck() {
         val cal = Calendar.getInstance()
-        val currentHour = String.format("%02d", cal.get(Calendar.HOUR_OF_DAY))
-        val currentMinute = String.format("%02d", cal.get(Calendar.MINUTE))
+        val currentHour = cal.get(Calendar.HOUR).run {
+            if (this.toString().length == 1) "0$this" else "$this"
+        }
+        val currentMinute = cal.get(Calendar.MINUTE).run {
+            if (this.toString().length == 1) "0$this" else "$this"
+        }
         val currentSecond = cal.get(Calendar.SECOND).toString()
+        val currentAmOrPm = cal.get(Calendar.AM_PM).run {
+            if (this == Calendar.AM) "AM" else "PM"
+        }
 
-        val currentAmOrPm = if (cal.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
         val currentDay = cal.get(Calendar.DAY_OF_WEEK).run {
             listOf("", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")[this]
         }
