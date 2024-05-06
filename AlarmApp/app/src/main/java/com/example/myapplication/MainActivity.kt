@@ -181,7 +181,7 @@ class MainActivity : ComponentActivity() {
                     val activeDays = getActiveDays(alarm.dayOfWeek)
                     Button(
                         onClick = {
-                            val navigate = Intent(this@MainActivity, MathGame::class.java)
+                            val navigate = Intent(this@MainActivity, AlarmSettings::class.java)
                             navigate.putExtra("BUTTON_INDEX", index)
                             startActivity(navigate)
                         },
