@@ -135,13 +135,6 @@ class AlarmSettings : ComponentActivity() {
         ConstraintLayout {
             val context = LocalContext.current
             //header notifying next alarm time
-            Text(
-                text = "Title $buttonID",
-                color =  Dark_Purple,
-                fontSize = 35.sp,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight.ExtraBold
-            )
             val (blankBox, titleBox, timeBox, optionBox) = createRefs()
             //blankbox = Header
             Box(
