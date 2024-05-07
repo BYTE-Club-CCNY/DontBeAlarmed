@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,16 +27,13 @@ import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.myapplication.database.readData
 import com.example.myapplication.ui.theme.Dark_Purple
-import com.example.myapplication.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.delay
 import java.util.Calendar
-import kotlin.random.Random
 
 class NoGame : ComponentActivity() {
     val alarms = readData(applicationContext)
@@ -58,7 +53,7 @@ class NoGame : ComponentActivity() {
                 while (true) {
                     val cal = Calendar.getInstance()
                     hour = cal.get(Calendar.HOUR).run {
-                        if (this.toString().length == 1) "0$this" else "$this"
+                        if (this == 1) "12" else if (this.toString().length == 1) "0$this" else "$this"
                     }
                     minute = cal.get(Calendar.MINUTE).run {
                         if (this.toString().length == 1) "0$this" else "$this"
