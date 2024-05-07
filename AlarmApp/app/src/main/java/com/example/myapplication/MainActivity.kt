@@ -304,17 +304,17 @@ class MainActivity : ComponentActivity() {
             Log.d("TimeCheck", "Alarm #$index - Time: ${alarmHour}:${alarmMinute} ${alarm.meridiem}, Day: ${alarm.dayOfWeek}, Status: ${alarm.alarmStatus}")
             if (currentHour == alarmHour && currentMinute == alarmMinute && currentAmOrPm == alarm.meridiem && alarm.dayOfWeek[currentDay] == true && alarm.alarmStatus == true && currentSecond == "0") {
                 Log.d("TimeCheck", "Alarm #$index triggered.")
-                if (alarm.gameType == 1){
+                if (alarm.gameType == 2){
                     val intent = Intent(applicationContext, MathGame::class.java).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
                     startActivity(intent)
                 }
                 else {
-                    val intent = Intent(applicationContext, NoGame::class.java).apply {
+                    val otherintent = Intent(applicationContext, NoGame::class.java).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     }
-                    startActivity(intent)
+                    startActivity(otherintent)
                 }
 
             }

@@ -37,8 +37,6 @@ import java.util.Calendar
 
 class NoGame : ComponentActivity() {
     val alarms = readData(applicationContext)
-    val buttonIndex = intent.getIntExtra("BUTTON_INDEX", -1)
-    val alarm = alarms?.get(buttonIndex)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -114,7 +112,6 @@ class NoGame : ComponentActivity() {
                         .fillMaxWidth()
                         .height(100.dp)
                 ) {
-                    alarm?.let {
                         Text(
                             style = LocalTextStyle.current.merge(
                                 TextStyle(
@@ -127,7 +124,7 @@ class NoGame : ComponentActivity() {
                                     )
                                 )
                             ),
-                            text = it.title,
+                            text = "Stop",
                             color = Dark_Purple,
                             fontSize = 60.sp,
                             fontFamily = fontFamily,
@@ -138,4 +135,3 @@ class NoGame : ComponentActivity() {
             }
         }
     }
-}
