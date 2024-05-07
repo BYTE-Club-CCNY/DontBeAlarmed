@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -36,7 +37,6 @@ import kotlinx.coroutines.delay
 import java.util.Calendar
 
 class NoGame : ComponentActivity() {
-    val alarms = readData(applicationContext)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -74,6 +74,11 @@ class NoGame : ComponentActivity() {
         minute: String,
         amOrPm: String,
     ) {
+        val alarms = readData(applicationContext)
+        val alarmindex = 0 //gotta replace this with the correct index
+        val alarm1 = alarms?.get(alarmindex)
+        title = alarm1?.title
+        Log.d("first alarmtitle", "alarm1 title: $title")
         ConstraintLayout {
             val (blankBox, stopButton) = createRefs()
             Box(
@@ -130,8 +135,9 @@ class NoGame : ComponentActivity() {
                             fontFamily = fontFamily,
                             fontWeight = FontWeight.ExtraBold,
                         )
-                    }
                 }
             }
         }
     }
+}
+
