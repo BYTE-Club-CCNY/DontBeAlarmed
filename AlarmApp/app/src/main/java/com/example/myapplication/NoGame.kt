@@ -74,10 +74,10 @@ class NoGame : ComponentActivity() {
         minute: String,
         amOrPm: String,
     ) {
+        val index = intent.getIntExtra("index", -1) // -1 is the default value if index is not found
         val alarms = readData(applicationContext)
-        val alarmindex = 0 //gotta replace this with the correct index
-        val alarm1 = alarms?.get(alarmindex)
-        title = alarm1?.title
+        val alarm1 = alarms?.get(index)
+        val stoptext = alarm1?.title
         Log.d("first alarmtitle", "alarm1 title: $title")
         ConstraintLayout {
             val (blankBox, stopButton) = createRefs()
@@ -117,6 +117,7 @@ class NoGame : ComponentActivity() {
                         .fillMaxWidth()
                         .height(100.dp)
                 ) {
+                    if (stoptext != null) {
                         Text(
                             style = LocalTextStyle.current.merge(
                                 TextStyle(
@@ -129,12 +130,13 @@ class NoGame : ComponentActivity() {
                                     )
                                 )
                             ),
-                            text = "Stop",
+                            text = stoptext,
                             color = Dark_Purple,
                             fontSize = 60.sp,
                             fontFamily = fontFamily,
                             fontWeight = FontWeight.ExtraBold,
                         )
+                    }
                 }
             }
         }

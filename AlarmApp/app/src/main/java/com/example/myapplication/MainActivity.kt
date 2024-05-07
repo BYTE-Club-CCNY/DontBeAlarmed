@@ -313,6 +313,7 @@ class MainActivity : ComponentActivity() {
                 else {
                     val otherintent = Intent(applicationContext, NoGame::class.java).apply {
                         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        putExtra("index", index) // Passing index as an extra
                     }
                     startActivity(otherintent)
                 }
@@ -377,4 +378,6 @@ fun doubledigit(num: String): String {
         num // Return original string if numInt is not between 0 and 9
     }
 }
+
+
 
